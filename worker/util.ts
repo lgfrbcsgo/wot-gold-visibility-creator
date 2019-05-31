@@ -18,9 +18,3 @@ async function loadImage(url: string): Promise<HTMLImageElement> {
         image.src = url;
     });
 }
-
-export function assert(bool: boolean, errorMsg?: string) {
-    if (!bool) {
-        throw new Error(errorMsg);
-    }
-}
