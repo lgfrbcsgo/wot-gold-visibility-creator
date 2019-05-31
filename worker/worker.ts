@@ -1,10 +1,11 @@
 import {expose, transfer} from 'comlink';
-import {WorkerExport} from './types';
+import {PackageCreator} from './types';
 
-const wasmModule = import('./wasm/pkg');
+const creator = import('./wasm/pkg');
 
-const createPackage: WorkerExport = async options => {
-    const result = (await wasmModule).create_package(options);
+const createPackage: PackageCreator = async options => {
+    const { create_package } = await creator;
+    const result = create_package(options);
     return transfer(result, [result.buffer]);
 };
 

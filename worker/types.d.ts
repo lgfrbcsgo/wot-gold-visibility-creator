@@ -16,4 +16,4 @@ export interface PackageOptions {
     deferred: TextureOptions;
 }
 
-export type WorkerExport = (options: PackageOptions) => Promise<Uint8Array>;
+export type PackageCreator = (options: PackageOptions) => Promise<Uint8Array>;

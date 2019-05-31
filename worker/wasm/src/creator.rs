@@ -69,7 +69,7 @@ pub fn create_package(options: PackageOptions) -> CreateResult<Vec<u8>> {
     Ok(cursor.into_inner())
 }
 
-pub fn create_texture(color: &ColorOptions, mut image_data: ImageData) -> CreateResult<Vec<u8>> {
+fn create_texture(color: &ColorOptions, mut image_data: ImageData) -> CreateResult<Vec<u8>> {
     let ColorOptions { r, g, b, alpha } = color;
 
     for index in 0..image_data.data.len() {

@@ -1,5 +1,5 @@
 import {wrap} from "comlink";
-import {ColorOptions, WorkerExport} from './types';
+import {ColorOptions, PackageCreator} from './types';
 
 import forwardResourcePath from './res/forward.png';
 import deferredResourcePath from './res/deferred.png';
@@ -7,7 +7,7 @@ import packagePaths from './res/paths.json';
 
 const createPackage = wrap(
     new Worker('./worker', {type: 'module'})
-) as WorkerExport;
+) as PackageCreator;
 
 const forwardImageData = loadImageData(forwardResourcePath);
 const deferredImageData = loadImageData(deferredResourcePath);
