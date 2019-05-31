@@ -1,0 +1,7 @@
+{
+  "paths": {
+    "forward": "res/particles/content_forward/PFX_textures/eff_tex.dds",
+    "deferred": "res/particles/content_deferred/PFX_textures/eff_tex.dds"
+  }
+}
+

@@ -1,13 +1,13 @@
 import {wrap} from 'comlink';
 import {ColorOptions, lazy, loadImageData, PackageCreator} from './common';
 
-import forwardResourcePath from './res/forward.png';
-import deferredResourcePath from './res/deferred.png';
-import packagePaths from './res/paths.json';
+import forwardResource from './res/forward.png';
+import deferredResource from './res/deferred.png';
+import config from './res/config.json';
 
 const setupWorker = lazy(() => wrap(new Worker('./worker', {type: 'module'})) as PackageCreator);
-const loadForward = lazy(() => loadImageData(forwardResourcePath));
-const loadDeferred = lazy(() => loadImageData(deferredResourcePath));
+const loadForward = lazy(() => loadImageData(forwardResource));
+const loadDeferred = lazy(() => loadImageData(deferredResource));
 
 export async function run(color: ColorOptions): Promise<any> {
     const worker = setupWorker();
@@ -15,11 +15,11 @@ export async function run(color: ColorOptions): Promise<any> {
         color,
         forward: {
             imageData: await loadForward(),
-            path: packagePaths.forward
+            path: config.paths.forward
         },
         deferred: {
             imageData: await loadDeferred(),
-            path: packagePaths.deferred
+            path: config.paths.deferred
         }
     });
 }
