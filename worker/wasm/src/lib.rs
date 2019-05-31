@@ -81,7 +81,7 @@ impl From<TextureOptions> for creator::TextureOptions {
     fn from(texture: TextureOptions) -> Self {
         creator::TextureOptions {
             path: texture.path(),
-            image_data: creator::ImageData::from(texture.image_data())
+            image_data: texture.image_data().into()
         }
     }
 }
@@ -103,9 +103,9 @@ extern "C" {
 impl From<PackageOptions> for creator::PackageOptions {
     fn from(package: PackageOptions) -> Self {
         creator::PackageOptions {
-            color: creator::ColorOptions::from(package.color()),
-            forward: creator::TextureOptions::from(package.forward()),
-            deferred: creator::TextureOptions::from(package.deferred())
+            color: package.color().into(),
+            forward: package.forward().into(),
+            deferred: package.deferred().into()
         }
     }
 }
@@ -113,5 +113,5 @@ impl From<PackageOptions> for creator::PackageOptions {
 #[wasm_bindgen]
 pub fn create_package(options: PackageOptions) -> Vec<u8> {
     use_panic_hook();
-    creator::create_package(creator::PackageOptions::from(options)).unwrap_throw()
+    creator::create_package(options.into()).unwrap_throw()
 }

@@ -31,26 +31,22 @@ pub struct ColorOptions {
     pub alpha: f32
 }
 
-
 pub struct ImageData {
     pub data: Vec<u8>,
     pub height: u32,
     pub width: u32
 }
 
-
 pub struct TextureOptions {
     pub image_data: ImageData,
     pub path: String
 }
-
 
 pub struct PackageOptions {
     pub color: ColorOptions,
     pub forward: TextureOptions,
     pub deferred: TextureOptions
 }
-
 
 pub fn create_package(options: PackageOptions) -> CreateResult<Vec<u8>> {
 
@@ -73,7 +69,6 @@ pub fn create_package(options: PackageOptions) -> CreateResult<Vec<u8>> {
     Ok(cursor.into_inner())
 }
 
-
 pub fn create_texture(color: &ColorOptions, mut image_data: ImageData) -> CreateResult<Vec<u8>> {
     let ColorOptions { r, g, b, alpha } = color;
 
@@ -88,7 +83,6 @@ pub fn create_texture(color: &ColorOptions, mut image_data: ImageData) -> Create
 
     encode_dds(&image_data)
 }
-
 
 fn encode_dds(image_data: &ImageData) -> CreateResult<Vec<u8>> {
     let ImageData { data, height, width } = image_data;
