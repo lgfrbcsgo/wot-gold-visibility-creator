@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-mod create;
+mod creator;
 
 #[macro_use]
 extern crate error_chain;
@@ -31,9 +31,9 @@ extern "C" {
     fn alpha(this: &ColorOptions) -> f32;
 }
 
-impl From<ColorOptions> for create::ColorOptions {
+impl From<ColorOptions> for creator::ColorOptions {
     fn from(color: ColorOptions) -> Self {
-        create::ColorOptions {
+        creator::ColorOptions {
             r: color.r(),
             g: color.g(),
             b: color.b(),
@@ -56,9 +56,9 @@ extern "C" {
     fn width(this: &ImageData) -> u32;
 }
 
-impl From<ImageData> for create::ImageData {
+impl From<ImageData> for creator::ImageData {
     fn from(image_data: ImageData) -> Self {
-        create::ImageData {
+        creator::ImageData {
             data: image_data.data(),
             height: image_data.height(),
             width: image_data.width()
@@ -77,11 +77,11 @@ extern "C" {
     fn image_data(this: &TextureOptions) -> ImageData;
 }
 
-impl From<TextureOptions> for create::TextureOptions {
+impl From<TextureOptions> for creator::TextureOptions {
     fn from(texture: TextureOptions) -> Self {
-        create::TextureOptions {
+        creator::TextureOptions {
             path: texture.path(),
-            image_data: create::ImageData::from(texture.image_data())
+            image_data: creator::ImageData::from(texture.image_data())
         }
     }
 }
@@ -100,12 +100,12 @@ extern "C" {
     fn deferred(this: &PackageOptions) -> TextureOptions;
 }
 
-impl From<PackageOptions> for create::PackageOptions {
+impl From<PackageOptions> for creator::PackageOptions {
     fn from(package: PackageOptions) -> Self {
-        create::PackageOptions {
-            color: create::ColorOptions::from(package.color()),
-            forward: create::TextureOptions::from(package.forward()),
-            deferred: create::TextureOptions::from(package.deferred())
+        creator::PackageOptions {
+            color: creator::ColorOptions::from(package.color()),
+            forward: creator::TextureOptions::from(package.forward()),
+            deferred: creator::TextureOptions::from(package.deferred())
         }
     }
 }
@@ -113,5 +113,5 @@ impl From<PackageOptions> for create::PackageOptions {
 #[wasm_bindgen]
 pub fn create_package(options: PackageOptions) -> Vec<u8> {
     use_panic_hook();
-    create::create_package(create::PackageOptions::from(options)).unwrap_throw()
+    creator::create_package(creator::PackageOptions::from(options)).unwrap_throw()
 }

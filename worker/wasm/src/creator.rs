@@ -7,9 +7,22 @@ use image::dxt::{DXTEncoder, DXTVariant};
 use zip::{ZipWriter, CompressionMethod};
 use zip::write::FileOptions;
 
-pub mod errors;
+pub mod errors {
+    error_chain! {
+        types {
+            CreateError, CreateErrorKind, CreateResultExt, CreateResult;
+        }
+        links {}
+        foreign_links {
+            DdsFile(::ddsfile::Error);
+            Image(::image::ImageError);
+            Zip(::zip::result::ZipError);
+            IO(::std::io::Error);
+        }
+        errors {}
+    }
+}
 use errors::CreateResult;
-
 
 pub struct ColorOptions {
     pub r: u8,
