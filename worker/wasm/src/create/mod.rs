@@ -11,7 +11,7 @@ pub mod errors;
 use errors::CreateResult;
 
 
-pub struct Color {
+pub struct ColorOptions {
     pub r: u8,
     pub g: u8,
     pub b: u8,
@@ -26,31 +26,34 @@ pub struct ImageData {
 }
 
 
-pub struct Texture<'a> {
+pub struct TextureOptions {
     pub image_data: ImageData,
-    pub path: &'a str
+    pub path: String
 }
 
 
-pub fn create_package(
-    color: &Color,
-    forward_texture: Texture,
-    deferred_texture: Texture
-) -> CreateResult<Vec<u8>> {
+pub struct PackageOptions {
+    pub color: ColorOptions,
+    pub forward: TextureOptions,
+    pub deferred: TextureOptions
+}
 
-    let mut buffer: Vec<u8> = Vec::new();
-    let mut cursor = Cursor::new(buffer);
+
+pub fn create_package(options: PackageOptions) -> CreateResult<Vec<u8>> {
+
+    let buffer: Vec<u8> = Vec::new();
+    let cursor = Cursor::new(buffer);
     let mut zip = ZipWriter::new(cursor);
 
-    let options = FileOptions::default().compression_method(CompressionMethod::Stored);
+    let zip_options = FileOptions::default().compression_method(CompressionMethod::Stored);
 
-    let mut forward_texture_data = create_texture(color, forward_texture.image_data)?;
-    zip.start_file(forward_texture.path, options)?;
-    zip.write(&forward_texture_data)?;
+    let forward_texture = create_texture(&options.color, options.forward.image_data)?;
+    zip.start_file(options.forward.path, zip_options)?;
+    zip.write(&forward_texture)?;
 
-    let mut deferred_texture_data = create_texture(color, deferred_texture.image_data)?;
-    zip.start_file(deferred_texture.path, options)?;
-    zip.write(&deferred_texture_data)?;
+    let deferred_texture = create_texture(&options.color, options.deferred.image_data)?;
+    zip.start_file(options.deferred.path, zip_options)?;
+    zip.write(&deferred_texture)?;
 
     let cursor = zip.finish()?;
 
@@ -58,8 +61,8 @@ pub fn create_package(
 }
 
 
-pub fn create_texture(color: &Color, mut image_data: ImageData) -> CreateResult<Vec<u8>> {
-    let Color { r, g, b, alpha } = color;
+pub fn create_texture(color: &ColorOptions, mut image_data: ImageData) -> CreateResult<Vec<u8>> {
+    let ColorOptions { r, g, b, alpha } = color;
 
     for index in 0..image_data.data.len() {
         image_data.data[index] = match index % 4 {

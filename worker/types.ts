@@ -1,15 +1,19 @@
-export interface Color {
+export interface ColorOptions {
     r: number;
     g: number;
-    b: number,
+    b: number;
     alpha: number;
 }
 
-
-export interface Texture {
+export interface TextureOptions {
     imageData: ImageData;
     path: string;
 }
 
+export interface PackageOptions {
+    color: ColorOptions;
+    forward: TextureOptions;
+    deferred: TextureOptions;
+}
 
-export type WorkerExport = (color: Color, textureForward: Texture, textureDeferred: Texture) => Promise<Uint8Array>;
+export type WorkerExport = (options: PackageOptions) => Promise<Uint8Array>;

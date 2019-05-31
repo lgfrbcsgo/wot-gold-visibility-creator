@@ -1,11 +1,11 @@
-import {Color} from "../worker/types";
+import {ColorOptions} from "../worker/types";
 
 export namespace Elm {
     namespace Main {
         export interface App {
             ports: {
                 run: {
-                    subscribe(callback: (color: Color) => void): void
+                    subscribe(callback: (color: ColorOptions) => void): void
                 }
             };
         }

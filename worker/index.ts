@@ -1,34 +1,30 @@
 import {wrap} from "comlink";
-import {Color, WorkerExport, Texture} from './types';
+import {ColorOptions, WorkerExport} from './types';
 
 import forwardResourcePath from './res/forward.png';
 import deferredResourcePath from './res/deferred.png';
 import packagePaths from './res/paths.json';
 
-
 const createPackage = wrap(
     new Worker('./worker', {type: 'module'})
 ) as WorkerExport;
 
-
 const forwardImageData = loadImageData(forwardResourcePath);
 const deferredImageData = loadImageData(deferredResourcePath);
 
-
-export async function run(color: Color): Promise<any> {
-    const textureForward: Texture = {
-        imageData: await forwardImageData,
-        path: packagePaths.forward
-    };
-
-    const textureDeferred: Texture = {
-        imageData: await deferredImageData,
-        path: packagePaths.deferred
-    };
-
-    return await createPackage(color, textureForward, textureDeferred);
+export async function run(color: ColorOptions): Promise<any> {
+    return await createPackage({
+        color,
+        forward: {
+            imageData: await forwardImageData,
+            path: packagePaths.forward
+        },
+        deferred: {
+            imageData: await deferredImageData,
+            path: packagePaths.deferred
+        }
+    });
 }
-
 
 // TODO have a look at https://github.com/GoogleChromeLabs/squoosh/blob/master/src/lib/util.ts
 async function loadImageData(url: string): Promise<ImageData> {
@@ -41,7 +37,6 @@ async function loadImageData(url: string): Promise<ImageData> {
     ctx.drawImage(image, 0, 0);
     return ctx.getImageData(0, 0, image.width, image.height);
 }
-
 
 async function loadImage(url: string): Promise<HTMLImageElement> {
     return await new Promise((resolve, reject) => {
