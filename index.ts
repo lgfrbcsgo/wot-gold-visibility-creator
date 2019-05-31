@@ -1,5 +1,4 @@
 import {run} from './worker';
-
 import {Elm} from './elm/Main';
 
 const app = Elm.Main.init({
