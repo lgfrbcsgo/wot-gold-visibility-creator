@@ -1,13 +1,13 @@
 import {wrap} from 'comlink';
-import {ColorOptions, lazy, loadImageData, PackageCreator} from './common';
+import {ColorOptions, lazy, loadImageData, PackageCreator, rethrowError} from './common';
 
 import forwardResource from './res/forward.png';
 import deferredResource from './res/deferred.png';
 import config from './res/config.json';
 
 const setupWorker = lazy(() => wrap(new Worker('./worker', {type: 'module'})) as PackageCreator);
-const loadForward = lazy(() => loadImageData(forwardResource));
-const loadDeferred = lazy(() => loadImageData(deferredResource));
+const loadForward = lazy(() => loadImageData(forwardResource).catch(rethrowError));
+const loadDeferred = lazy(() => loadImageData(deferredResource).catch(rethrowError));
 
 export async function run(color: ColorOptions): Promise<any> {
     const worker = setupWorker();

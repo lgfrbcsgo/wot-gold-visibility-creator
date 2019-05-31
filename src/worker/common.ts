@@ -30,6 +30,13 @@ export function lazy<T, V>(innerFunc: () => V) {
     }
 }
 
+export function rethrowError(e: Error) {
+    setTimeout(() => {
+        throw e;
+    });
+    return Promise.reject(e);
+}
+
 export async function loadImageData(url: string): Promise<ImageData> {
     const image = await loadImage(url);
     const canvas = document.createElement('canvas') as HTMLCanvasElement;
