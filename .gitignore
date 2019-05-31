@@ -1,0 +1,8 @@
+dist
+node_modules
+elm-stuff
+worker/wasm/bin
+worker/wasm/pkg
+worker/wasm/target
+worker/wasm/wasm-pack.log
+.idea
