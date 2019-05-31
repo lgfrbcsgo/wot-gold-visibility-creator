@@ -11,7 +11,7 @@ pub mod errors;
 use errors::CreateResult;
 
 
-pub struct RGBA {
+pub struct Color {
     pub r: u8,
     pub g: u8,
     pub b: u8,
@@ -26,10 +26,16 @@ pub struct ImageData {
 }
 
 
+pub struct Texture<'a> {
+    pub image_data: ImageData,
+    pub path: &'a str
+}
+
+
 pub fn create_package(
-    color: &RGBA,
-    forward_image_data: ImageData, forward_path: &str,
-    deferred_image_data: ImageData, deferred_path: &str
+    color: &Color,
+    forward_texture: Texture,
+    deferred_texture: Texture
 ) -> CreateResult<Vec<u8>> {
 
     let mut buffer: Vec<u8> = Vec::new();
@@ -38,13 +44,13 @@ pub fn create_package(
 
     let options = FileOptions::default().compression_method(CompressionMethod::Stored);
 
-    let mut forward_texture = create_texture(color, forward_image_data)?;
-    zip.start_file(forward_path, options)?;
-    zip.write(forward_texture.as_mut())?;
+    let mut forward_texture_data = create_texture(color, forward_texture.image_data)?;
+    zip.start_file(forward_texture.path, options)?;
+    zip.write(&forward_texture_data)?;
 
-    let mut deferred_texture = create_texture(color, deferred_image_data)?;
-    zip.start_file(deferred_path, options)?;
-    zip.write(deferred_texture.as_mut())?;
+    let mut deferred_texture_data = create_texture(color, deferred_texture.image_data)?;
+    zip.start_file(deferred_texture.path, options)?;
+    zip.write(&deferred_texture_data)?;
 
     let cursor = zip.finish()?;
 
@@ -52,8 +58,8 @@ pub fn create_package(
 }
 
 
-pub fn create_texture(color: &RGBA, mut image_data: ImageData) -> CreateResult<Vec<u8>> {
-    let RGBA { r, g, b, alpha } = color;
+pub fn create_texture(color: &Color, mut image_data: ImageData) -> CreateResult<Vec<u8>> {
+    let Color { r, g, b, alpha } = color;
 
     for index in 0..image_data.data.len() {
         image_data.data[index] = match index % 4 {

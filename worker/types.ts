@@ -5,11 +5,11 @@ export interface Color {
     alpha: number;
 }
 
+
 export interface Texture {
-    data: Uint8Array,
-    height: number;
-    width: number;
+    imageData: ImageData;
     path: string;
 }
 
-export type CreatePackageFunction = (color: Color, textureForward: Texture, textureDeferred: Texture) => Promise<Uint8Array>;
+
+export type WorkerExport = (color: Color, textureForward: Texture, textureDeferred: Texture) => Promise<Uint8Array>;

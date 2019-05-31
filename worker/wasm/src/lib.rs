@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 
 mod create;
-use create::{ImageData, RGBA};
+use create::{ImageData, Color, Texture};
 
 #[macro_use]
 extern crate error_chain;
@@ -27,9 +27,23 @@ pub fn create_package(
     use_panic_hook();
 
     create::create_package(
-        &RGBA { r, g, b, alpha },
-        ImageData { data: forward_data, height: forward_height, width: forward_width }, forward_path,
-        ImageData { data: deferred_data, height: deferred_height, width: deferred_width }, deferred_path
+        &Color { r, g, b, alpha },
+        Texture {
+            image_data: ImageData {
+                data: forward_data,
+                height: forward_height,
+                width: forward_width
+            },
+            path: forward_path
+        },
+        Texture {
+            image_data: ImageData {
+                data: deferred_data,
+                height: deferred_height,
+                width: deferred_width
+            },
+            path: deferred_path
+        }
     ).unwrap_throw()
 }
 
