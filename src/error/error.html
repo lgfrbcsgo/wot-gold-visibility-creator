@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Something went wrong</title>
+</head>
+<body>
+    <div id="error-msg"></div>
+    <script>
+        var errorContainer = document.getElementById('error-msg');
+        errorContainer.innerText = decodeURIComponent(window.location.hash.slice(1));
+    </script>
+</body>
+</html>

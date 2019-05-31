@@ -1,4 +1,4 @@
-import {ColorOptions} from "../worker/types";
+import {ColorOptions} from "../worker/common";
 
 export namespace Elm {
     namespace Main {

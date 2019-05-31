@@ -7,7 +7,7 @@ const WorkerPlugin = require('worker-plugin');
 const dist = path.resolve(__dirname, 'dist');
 
 module.exports = {
-    entry: './index.ts',
+    entry: './src/app/index.ts',
     output: {
         path: dist,
         filename: '[name].[hash].js',
@@ -55,10 +55,16 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            template: 'index.html'
+            filename: 'index.html',
+            template: 'src/app/index.html'
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'error.html',
+            template: 'src/error/error.html',
+            inject: false
         }),
         new WasmPackPlugin({
-            crateDirectory: path.resolve(__dirname, 'worker/wasm'),
+            crateDirectory: path.resolve(__dirname, 'src/app/worker/wasm'),
             forceMode: 'production'
         }),
         new WorkerPlugin({
