@@ -1,8 +1,8 @@
 dist
 node_modules
 elm-stuff
-worker/wasm/bin
-worker/wasm/pkg
-worker/wasm/target
-worker/wasm/wasm-pack.log
+src/worker/wasm/bin
+src/worker/wasm/pkg
+src/worker/wasm/target
+src/worker/wasm/wasm-pack.log
 .idea
