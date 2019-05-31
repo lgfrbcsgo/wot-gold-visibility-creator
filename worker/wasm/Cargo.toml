@@ -19,6 +19,7 @@ default-features = false
 
 [dependencies]
 ddsfile = "0.2.3"
+error-chain = "0.12.1"
 wasm-bindgen = "0.2.25"
 console_error_panic_hook = { version = "0.1.5", optional = true }
 wee_alloc = { version = "0.4.2", optional = true }

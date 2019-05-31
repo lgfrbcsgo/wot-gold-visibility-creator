@@ -38,8 +38,8 @@ update msg model =
             , run
                 (E.object
                     [ ( "r", E.int 255 )
-                    , ( "g", E.int 255 )
-                    , ( "b", E.int 127 )
+                    , ( "g", E.int 0 )
+                    , ( "b", E.int 255 )
                     , ( "alpha", E.float 1 )
                     ]
                 )
