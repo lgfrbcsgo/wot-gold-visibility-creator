@@ -10,7 +10,9 @@ const cssnano = require('cssnano');
 const autoprefixer = require('autoprefixer');
 
 
-const dist = path.resolve(__dirname, 'dist');
+const project = __dirname;
+const dist = path.resolve(project, 'dist');
+const wasm = path.resolve(project, 'src/worker/wasm');
 
 const createConfig = (inProd, inDev) => ({
     entry: './src/index.ts',
@@ -33,7 +35,7 @@ const createConfig = (inProd, inDev) => ({
                     {
                         loader: 'elm-webpack-loader',
                         options: {
-                            cwd: __dirname,
+                            cwd: project,
                             ...inDev({
                                 debug: true
                             }),
@@ -111,7 +113,7 @@ const createConfig = (inProd, inDev) => ({
             inject: false
         }),
         new WasmPackPlugin({
-            crateDirectory: path.resolve(__dirname, 'src/worker/wasm'),
+            crateDirectory: wasm,
             forceMode: 'production'
         }),
         new WorkerPlugin({
