@@ -41,7 +41,23 @@ module.exports = env => ({
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader?modules=true']
+                use: [
+                    { loader:  'style-loader' },
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                            importLoaders: 1
+                        }
+                    },
+                    {
+                        loader: '@americanexpress/purgecss-loader',
+                        options: {
+                            paths: [path.join(__dirname, 'src/**/*\.elm')],
+                        },
+                    },
+                    { loader: 'postcss-loader' }
+                ]
             },
             {
                 test: /\.png$/,

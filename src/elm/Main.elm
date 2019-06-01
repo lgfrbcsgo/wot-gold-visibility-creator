@@ -2,9 +2,9 @@ port module Main exposing (main)
 
 import Browser
 import Color exposing (Color, hsla, rgba, toCssString, toHsla, toRgba)
-import CssModules exposing (css)
 import Html exposing (..)
 import Html.Events exposing (..)
+import Styles exposing (styles)
 import Svg
 import Svg.Attributes
 
@@ -19,12 +19,6 @@ port saveBlob : { blobUrl : String, fileName : String } -> Cmd msg
 
 
 port getPackage : (Package -> msg) -> Sub msg
-
-
-styles =
-    css "./Main.css"
-        { colorPickerContainer = "color-picker-container"
-        }
 
 
 
@@ -130,7 +124,7 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ onClick CreatePackage ] [ text "Run" ]
+        [ button [ styles.class .btn, styles.class .btnBlue, onClick CreatePackage ] [ text "Run" ]
         , renderGradient model.color
         ]
 
