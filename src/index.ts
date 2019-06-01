@@ -7,7 +7,7 @@ const app = Elm.Main.init({
 
 app.ports.runWorker.subscribe(async color => {
     const buffer = await run(color);
-    const blob = new Blob([new Uint8Array(buffer)]);
+    const blob = new Blob([buffer]);
     app.ports.getPackage.send({
         color,
         blobUrl: URL.createObjectURL(blob)
