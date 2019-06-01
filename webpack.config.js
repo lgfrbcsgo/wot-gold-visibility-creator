@@ -22,6 +22,7 @@ module.exports = env => ({
                 test: /\.elm$/,
                 exclude: [/elm-stuff/, /node_modules/],
                 use: [
+                    { loader: 'elm-css-modules-loader' },
                     { loader: 'elm-hot-webpack-loader' },
                     {
                         loader: 'elm-webpack-loader',
@@ -37,6 +38,10 @@ module.exports = env => ({
                 test: /\.ts$/,
                 use: 'ts-loader',
                 exclude: /node_modules/
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader?modules=true']
             },
             {
                 test: /\.png$/,

@@ -2,10 +2,11 @@ port module Main exposing (main)
 
 import Browser
 import Color exposing (Color, hsla, rgba, toCssString, toHsla, toRgba)
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
-import Svg exposing (Svg, defs, linearGradient, rect, stop, svg)
-import Svg.Attributes exposing (fill, height, id, offset, stopColor, style, width, x1, x2, y1, y2)
+import CssModules exposing (css)
+import Html exposing (..)
+import Html.Events exposing (..)
+import Svg
+import Svg.Attributes
 
 
 port runWorker : RGBA -> Cmd msg
@@ -18,6 +19,12 @@ port saveBlob : { blobUrl : String, fileName : String } -> Cmd msg
 
 
 port getPackage : (Package -> msg) -> Sub msg
+
+
+styles =
+    css "./Main.css"
+        { colorPickerContainer = "color-picker-container"
+        }
 
 
 
@@ -53,7 +60,7 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init flags =
-    ( Model (rgba 1.0 1.0 0.0 1.0) Initial []
+    ( Model (rgba 1.0 1.0 0.0 0.5) Initial []
     , Cmd.none
     )
 
@@ -131,22 +138,68 @@ view model =
 renderGradient : Color -> Html Msg
 renderGradient color =
     let
-        { hue } =
+        { hue, alpha } =
             toHsla color
     in
-    svg [ width "500", height "500" ]
-        [ defs []
-            [ linearGradient [ id "toBlack", x1 "0%", x2 "0%", y1 "0%", y2 "100%" ]
-                [ stop [ offset "0%", stopColor "white" ] []
-                , stop [ offset "100%", stopColor "black" ] []
-                ]
-            , linearGradient [ id "toHue", x1 "0%", x2 "100%", y1 "0%", y2 "0%" ]
-                [ stop [ offset "0%", stopColor "white" ] []
-                , stop [ offset "100%", stopColor <| toCssString <| hsla hue 1.0 0.5 1.0 ] []
-                ]
+    div
+        [ styles.class .colorPickerContainer ]
+        [ Svg.svg
+            [ Svg.Attributes.width "100%"
+            , Svg.Attributes.height "100%"
+            , Svg.Attributes.opacity <| String.fromFloat alpha
             ]
-        , rect [ width "100%", height "100%", fill "url(#toBlack)" ] []
-        , rect [ width "100%", height "100%", fill "url(#toHue)", style "mix-blend-mode: multiply" ] []
+            [ Svg.defs []
+                [ Svg.linearGradient
+                    [ Svg.Attributes.id "toBlack"
+                    , Svg.Attributes.x1 "0%"
+                    , Svg.Attributes.x2 "0%"
+                    , Svg.Attributes.y1 "0%"
+                    , Svg.Attributes.y2 "100%"
+                    ]
+                    [ Svg.stop
+                        [ Svg.Attributes.offset "0%"
+                        , Svg.Attributes.stopColor "white"
+                        ]
+                        []
+                    , Svg.stop
+                        [ Svg.Attributes.offset "100%"
+                        , Svg.Attributes.stopColor "black"
+                        ]
+                        []
+                    ]
+                , Svg.linearGradient
+                    [ Svg.Attributes.id "toHue"
+                    , Svg.Attributes.x1 "0%"
+                    , Svg.Attributes.x2 "100%"
+                    , Svg.Attributes.y1 "0%"
+                    , Svg.Attributes.y2 "0%"
+                    ]
+                    [ Svg.stop
+                        [ Svg.Attributes.offset "0%"
+                        , Svg.Attributes.stopColor "white"
+                        ]
+                        []
+                    , Svg.stop
+                        [ Svg.Attributes.offset "100%"
+                        , Svg.Attributes.stopColor <| toCssString <| hsla hue 1.0 0.5 1.0
+                        ]
+                        []
+                    ]
+                ]
+            , Svg.rect
+                [ Svg.Attributes.width "100%"
+                , Svg.Attributes.height "100%"
+                , Svg.Attributes.fill "url(#toBlack)"
+                ]
+                []
+            , Svg.rect
+                [ Svg.Attributes.width "100%"
+                , Svg.Attributes.height "100%"
+                , Svg.Attributes.fill "url(#toHue)"
+                , Svg.Attributes.style "mix-blend-mode: multiply"
+                ]
+                []
+            ]
         ]
 
 
