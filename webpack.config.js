@@ -68,15 +68,15 @@ const createConfig = (inProd, inDev) => ({
                             ident: 'postcss',
                             plugins: [
                                 tailwindcss(),
+                                purgecss({
+                                    content: [
+                                        './src/**/*.elm',
+                                        './src/**/*.html'
+                                    ],
+                                }),
                                 ...inProd([
                                     cssnano({
                                         preset: 'default',
-                                    }),
-                                    purgecss({
-                                        content: [
-                                            './src/**/*.elm',
-                                            './src/**/*.html'
-                                        ],
                                     }),
                                     autoprefixer
                                 ])
