@@ -105,11 +105,11 @@ const createConfig = (inProd, inDev) => ({
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            template: 'src/index.html'
+            template: 'index.html'
         }),
         new HtmlWebpackPlugin({
             filename: 'error.html',
-            template: 'src/error.html',
+            template: 'error.html',
             inject: false
         }),
         new WasmPackPlugin({

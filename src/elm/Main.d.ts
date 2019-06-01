@@ -1,4 +1,4 @@
-import {ColorOptions} from "../worker/common";
+import {ColorOptions} from "../common";
 
 interface PortToElm<T> {
     send(value: T) : void;
