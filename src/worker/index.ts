@@ -1,9 +1,9 @@
 import {wrap} from 'comlink';
 import {ColorOptions, lazy, loadImageData, PackageCreator, rethrowError} from './common';
 
-import forwardResource from './res/forward.png';
-import deferredResource from './res/deferred.png';
-import config from './res/config.json';
+import forwardResource from '../../res/forward.png';
+import deferredResource from '../../res/deferred.png';
+import config from '../../res/config.json';
 
 const setupWorker = lazy(() => wrap(new Worker('./worker', {type: 'module'})) as PackageCreator);
 const loadForward = lazy(() => loadImageData(forwardResource).catch(rethrowError));

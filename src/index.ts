@@ -5,13 +5,12 @@ const app = Elm.Main.init({
     node: document.getElementById('app')
 });
 
-app.ports.startCreator.subscribe(color => {
-    run(color).then(buffer => {
-        const blob = new Blob([new Uint8Array(buffer)]);
-        app.ports.getPackage.send({
-            color,
-            blobUrl: URL.createObjectURL(blob)
-        });
+app.ports.runWorker.subscribe(async color => {
+    const buffer = await run(color);
+    const blob = new Blob([new Uint8Array(buffer)]);
+    app.ports.getPackage.send({
+        color,
+        blobUrl: URL.createObjectURL(blob)
     });
 });
 

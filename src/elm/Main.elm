@@ -5,7 +5,7 @@ import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
 
 
-port startCreator : Color -> Cmd msg
+port runWorker : Color -> Cmd msg
 
 
 port revokeBlob : String -> Cmd msg
@@ -89,7 +89,7 @@ createPackage model =
     case model.worker of
         Initial ->
             ( { model | worker = Running }
-            , startCreator model.color
+            , runWorker model.color
             )
 
         Running ->
@@ -102,7 +102,7 @@ createPackage model =
               }
             , Cmd.batch
                 [ revokeBlob blobUrl
-                , startCreator model.color
+                , runWorker model.color
                 ]
             )
 
