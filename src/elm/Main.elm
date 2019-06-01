@@ -1,11 +1,11 @@
 port module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Html exposing (..)
+import Html.Events exposing (..)
 
 
-port runWorker : Color -> Cmd msg
+port runWorker : RGBA -> Cmd msg
 
 
 port revokeBlob : String -> Cmd msg
@@ -21,16 +21,16 @@ port getPackage : (Package -> msg) -> Sub msg
 ---- MODEL ----
 
 
-type alias Color =
-    { r : Int
-    , g : Int
-    , b : Int
+type alias RGBA =
+    { red : Float
+    , green : Float
+    , blue : Float
     , alpha : Float
     }
 
 
 type alias Package =
-    { color : Color
+    { color : RGBA
     , blobUrl : String
     }
 
@@ -42,23 +42,15 @@ type Worker
 
 
 type alias Model =
-    { color : Color
+    { color : RGBA
     , worker : Worker
-    , previousColors : List Color
+    , previousColors : List RGBA
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init flags =
-    ( { color =
-            { r = 255
-            , g = 0
-            , b = 255
-            , alpha = 1
-            }
-      , worker = Initial
-      , previousColors = []
-      }
+    ( Model (RGBA 0.0 1.0 0.0 1.0) Initial []
     , Cmd.none
     )
 
@@ -96,10 +88,7 @@ createPackage model =
             ( model, Cmd.none )
 
         Done { color, blobUrl } ->
-            ( { color = model.color
-              , worker = Running
-              , previousColors = color :: model.previousColors
-              }
+            ( Model model.color Running (color :: model.previousColors)
             , Cmd.batch
                 [ revokeBlob blobUrl
                 , runWorker model.color

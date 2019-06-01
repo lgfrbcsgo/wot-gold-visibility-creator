@@ -1,7 +1,7 @@
 export interface ColorOptions {
-    r: number;
-    g: number;
-    b: number;
+    red: number;
+    green: number;
+    blue: number;
     alpha: number;
 }
 

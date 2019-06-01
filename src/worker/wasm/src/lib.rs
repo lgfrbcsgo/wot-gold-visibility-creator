@@ -19,13 +19,13 @@ extern "C" {
     pub type ColorOptions;
 
     #[wasm_bindgen(method, getter)]
-    fn r(this: &ColorOptions) -> u8;
+    fn red(this: &ColorOptions) -> f32;
 
     #[wasm_bindgen(method, getter)]
-    fn g(this: &ColorOptions) -> u8;
+    fn green(this: &ColorOptions) -> f32;
 
     #[wasm_bindgen(method, getter)]
-    fn b(this: &ColorOptions) -> u8;
+    fn blue(this: &ColorOptions) -> f32;
 
     #[wasm_bindgen(method, getter)]
     fn alpha(this: &ColorOptions) -> f32;
@@ -34,9 +34,9 @@ extern "C" {
 impl From<ColorOptions> for creator::ColorOptions {
     fn from(color: ColorOptions) -> Self {
         creator::ColorOptions {
-            r: color.r(),
-            g: color.g(),
-            b: color.b(),
+            red: color.red(),
+            green: color.green(),
+            blue: color.blue(),
             alpha: color.alpha()
         }
     }
