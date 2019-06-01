@@ -6,7 +6,7 @@ const WorkerPlugin = require('worker-plugin');
 
 const dist = path.resolve(__dirname, 'dist');
 
-module.exports = {
+module.exports = env => ({
     entry: './src/index.ts',
     output: {
         path: dist,
@@ -27,7 +27,8 @@ module.exports = {
                         loader: 'elm-webpack-loader',
                         options: {
                             cwd: __dirname,
-                            optimize: true
+                            optimize: env === 'prod',
+                            debug: env === 'dev'
                         }
                     }
                 ]
@@ -72,4 +73,4 @@ module.exports = {
             globalObject: 'self'
         })
     ]
-};
+});

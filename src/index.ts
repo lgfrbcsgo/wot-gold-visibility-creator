@@ -5,22 +5,24 @@ const app = Elm.Main.init({
     node: document.getElementById('app')
 });
 
-app.ports.run.subscribe(color => {
+app.ports.startCreator.subscribe(color => {
     run(color).then(buffer => {
         const blob = new Blob([new Uint8Array(buffer)]);
-        saveFile(blob, 'goldvisibility.color.wotmod');
+        app.ports.getPackage.send({
+            color,
+            blobUrl: URL.createObjectURL(blob)
+        });
     });
 });
 
-function saveFile(blob: Blob, filename: string) {
+app.ports.revokeBlob.subscribe(blobUrl => {
+    URL.revokeObjectURL(blobUrl);
+});
+
+app.ports.saveBlob.subscribe(({ blobUrl, fileName }) => {
     const a = document.createElement('a');
     document.body.appendChild(a);
-    const url = window.URL.createObjectURL(blob);
-    a.href = url;
-    a.download = filename;
+    a.href = blobUrl;
+    a.download = fileName;
     a.click();
-    setTimeout(() => {
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    });
-}
+});

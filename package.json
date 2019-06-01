@@ -4,8 +4,8 @@
   "version": "2.0.0",
   "license": "Apache-2.0/MIT",
   "scripts": {
-    "start": "webpack-dev-server -d",
-    "build": "webpack"
+    "start": "webpack-dev-server -d --env=dev",
+    "build": "webpack --env=prod"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "0.2.7",
