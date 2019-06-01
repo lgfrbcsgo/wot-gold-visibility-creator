@@ -4,9 +4,15 @@ const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WorkerPlugin = require('worker-plugin');
 
+const tailwindcss = require('tailwindcss');
+const purgecss = require('@fullhuman/postcss-purgecss');
+const cssnano = require('cssnano');
+const autoprefixer = require('autoprefixer');
+
+
 const dist = path.resolve(__dirname, 'dist');
 
-module.exports = env => ({
+const createConfig = (inProd, inDev) => ({
     entry: './src/index.ts',
     output: {
         path: dist,
@@ -28,8 +34,12 @@ module.exports = env => ({
                         loader: 'elm-webpack-loader',
                         options: {
                             cwd: __dirname,
-                            optimize: env === 'prod',
-                            debug: env === 'dev'
+                            ...inDev({
+                                debug: true
+                            }),
+                            ...inProd({
+                                optimize: true
+                            })
                         }
                     }
                 ]
@@ -51,12 +61,26 @@ module.exports = env => ({
                         }
                     },
                     {
-                        loader: '@americanexpress/purgecss-loader',
+                        loader: 'postcss-loader',
                         options: {
-                            paths: [path.join(__dirname, 'src/**/*\.elm')],
-                        },
-                    },
-                    { loader: 'postcss-loader' }
+                            ident: 'postcss',
+                            plugins: [
+                                tailwindcss(),
+                                ...inProd([
+                                    cssnano({
+                                        preset: 'default',
+                                    }),
+                                    purgecss({
+                                        content: [
+                                            './src/**/*.elm',
+                                            './src/**/*.html'
+                                        ],
+                                    }),
+                                    autoprefixer
+                                ])
+                            ]
+                        }
+                    }
                 ]
             },
             {
@@ -95,3 +119,19 @@ module.exports = env => ({
         })
     ]
 });
+
+module.exports = (env, argv) => createConfig(inProd(argv.p), inDev(argv.p));
+
+function inProd(isProd) {
+    return arrayOrObject => {
+        if (isProd) {
+            return arrayOrObject;
+        } else {
+            return Array.isArray(arrayOrObject) ? [] : {};
+        }
+    }
+}
+
+function inDev(isProd) {
+    return inProd(!isProd);
+}
