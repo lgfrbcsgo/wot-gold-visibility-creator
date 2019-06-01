@@ -24,4 +24,7 @@ app.ports.saveBlob.subscribe(({ blobUrl, fileName }) => {
     a.href = blobUrl;
     a.download = fileName;
     a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+    });
 });
