@@ -16,23 +16,23 @@ pub fn use_panic_hook() {
 
 #[wasm_bindgen]
 extern "C" {
-    pub type ColorOptions;
+    pub type JsColorOptions;
 
     #[wasm_bindgen(method, getter)]
-    fn red(this: &ColorOptions) -> f32;
+    fn red(this: &JsColorOptions) -> f32;
 
     #[wasm_bindgen(method, getter)]
-    fn green(this: &ColorOptions) -> f32;
+    fn green(this: &JsColorOptions) -> f32;
 
     #[wasm_bindgen(method, getter)]
-    fn blue(this: &ColorOptions) -> f32;
+    fn blue(this: &JsColorOptions) -> f32;
 
     #[wasm_bindgen(method, getter)]
-    fn alpha(this: &ColorOptions) -> f32;
+    fn alpha(this: &JsColorOptions) -> f32;
 }
 
-impl From<ColorOptions> for creator::ColorOptions {
-    fn from(color: ColorOptions) -> Self {
+impl From<JsColorOptions> for creator::ColorOptions {
+    fn from(color: JsColorOptions) -> Self {
         creator::ColorOptions {
             red: color.red(),
             green: color.green(),
@@ -44,20 +44,20 @@ impl From<ColorOptions> for creator::ColorOptions {
 
 #[wasm_bindgen]
 extern "C" {
-    pub type ImageData;
+    pub type JsImageData;
 
     #[wasm_bindgen(method, getter)]
-    fn data(this: &ImageData) -> Vec<u8>;
+    fn data(this: &JsImageData) -> Vec<u8>;
 
     #[wasm_bindgen(method, getter)]
-    fn height(this: &ImageData) -> u32;
+    fn height(this: &JsImageData) -> u32;
 
     #[wasm_bindgen(method, getter)]
-    fn width(this: &ImageData) -> u32;
+    fn width(this: &JsImageData) -> u32;
 }
 
-impl From<ImageData> for creator::ImageData {
-    fn from(image_data: ImageData) -> Self {
+impl From<JsImageData> for creator::ImageData {
+    fn from(image_data: JsImageData) -> Self {
         creator::ImageData {
             data: image_data.data(),
             height: image_data.height(),
@@ -68,17 +68,17 @@ impl From<ImageData> for creator::ImageData {
 
 #[wasm_bindgen]
 extern "C" {
-    pub type TextureOptions;
+    pub type JsTextureOptions;
 
     #[wasm_bindgen(method, getter)]
-    fn path(this: &TextureOptions) -> String;
+    fn path(this: &JsTextureOptions) -> String;
 
-    #[wasm_bindgen(method, getter = imageData)]
-    fn image_data(this: &TextureOptions) -> ImageData;
+    #[wasm_bindgen(method, getter = JsImageData)]
+    fn image_data(this: &JsTextureOptions) -> JsImageData;
 }
 
-impl From<TextureOptions> for creator::TextureOptions {
-    fn from(texture: TextureOptions) -> Self {
+impl From<JsTextureOptions> for creator::TextureOptions {
+    fn from(texture: JsTextureOptions) -> Self {
         creator::TextureOptions {
             path: texture.path(),
             image_data: texture.image_data().into()
@@ -88,20 +88,20 @@ impl From<TextureOptions> for creator::TextureOptions {
 
 #[wasm_bindgen]
 extern "C" {
-    pub type PackageOptions;
+    pub type JsPackageOptions;
 
     #[wasm_bindgen(method, getter)]
-    fn color(this: &PackageOptions) -> ColorOptions;
+    fn color(this: &JsPackageOptions) -> JsColorOptions;
 
     #[wasm_bindgen(method, getter)]
-    fn forward(this: &PackageOptions) -> TextureOptions;
+    fn forward(this: &JsPackageOptions) -> JsTextureOptions;
 
     #[wasm_bindgen(method, getter)]
-    fn deferred(this: &PackageOptions) -> TextureOptions;
+    fn deferred(this: &JsPackageOptions) -> JsTextureOptions;
 }
 
-impl From<PackageOptions> for creator::PackageOptions {
-    fn from(package: PackageOptions) -> Self {
+impl From<JsPackageOptions> for creator::PackageOptions {
+    fn from(package: JsPackageOptions) -> Self {
         creator::PackageOptions {
             color: package.color().into(),
             forward: package.forward().into(),
@@ -111,7 +111,7 @@ impl From<PackageOptions> for creator::PackageOptions {
 }
 
 #[wasm_bindgen]
-pub fn create_package(options: PackageOptions) -> Vec<u8> {
+pub fn create_package(options: JsPackageOptions) -> Vec<u8> {
     use_panic_hook();
     creator::create_package(options.into()).unwrap_throw()
 }
