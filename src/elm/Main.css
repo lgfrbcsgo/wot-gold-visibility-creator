@@ -25,3 +25,7 @@
 .btn-blue:hover {
     @apply bg-blue-600;
 }
+
+body {
+    @apply font-sans
+}
