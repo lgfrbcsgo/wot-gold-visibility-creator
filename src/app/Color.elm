@@ -1,9 +1,12 @@
-module Color exposing (Color, Hsva, Rgba, convertHsvaToRgba, convertRgbaToHsva, fromHsva, fromRgba, toCssColor, toHsva, toRgba)
-
-
-type Color
-    = IRgba Rgba
-    | IHsva Hsva
+module Color exposing
+    ( Hsva
+    , Rgba
+    , convertHsvaToRgba
+    , convertRgbaToHsva
+    , sanitizeHsva
+    , sanitizeRgba
+    , toCssColor
+    )
 
 
 type alias Rgba =
@@ -22,32 +25,26 @@ type alias Hsva =
     }
 
 
-fromRgba : Rgba -> Color
-fromRgba { red, green, blue, alpha } =
-    IRgba
-        { red = red |> min 255 |> max 0
-        , green = green |> min 255 |> max 0
-        , blue = blue |> min 255 |> max 0
-        , alpha = alpha |> min 1.0 |> max 0.0
-        }
+sanitizeRgba : Rgba -> Rgba
+sanitizeRgba { red, green, blue, alpha } =
+    { red = red |> min 255 |> max 0
+    , green = green |> min 255 |> max 0
+    , blue = blue |> min 255 |> max 0
+    , alpha = alpha |> min 1.0 |> max 0.0
+    }
 
 
-fromHsva : Hsva -> Color
-fromHsva { hue, saturation, value, alpha } =
-    IHsva
-        { hue = hue
-        , saturation = saturation |> min 1.0 |> max 0.0
-        , value = value |> min 1.0 |> max 0.0
-        , alpha = alpha |> min 1.0 |> max 0.0
-        }
+sanitizeHsva : Hsva -> Hsva
+sanitizeHsva { hue, saturation, value, alpha } =
+    { hue = hue
+    , saturation = saturation |> min 1.0 |> max 0.0
+    , value = value |> min 1.0 |> max 0.0
+    , alpha = alpha |> min 1.0 |> max 0.0
+    }
 
 
-toCssColor : Color -> String
-toCssColor color =
-    let
-        { red, green, blue, alpha } =
-            toRgba color
-    in
+toCssColor : Rgba -> String
+toCssColor { red, green, blue, alpha } =
     "rgba("
         ++ String.fromInt red
         ++ ","
@@ -57,26 +54,6 @@ toCssColor color =
         ++ ","
         ++ String.fromFloat alpha
         ++ ")"
-
-
-toRgba : Color -> Rgba
-toRgba color =
-    case color of
-        IRgba rgba ->
-            rgba
-
-        IHsva hsva ->
-            convertHsvaToRgba hsva
-
-
-toHsva : Color -> Hsva
-toHsva color =
-    case color of
-        IHsva hsva ->
-            hsva
-
-        IRgba rgba ->
-            convertRgbaToHsva rgba
 
 
 fModBy : Float -> Int -> Float

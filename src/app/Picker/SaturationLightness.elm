@@ -1,6 +1,8 @@
-module Picker.SaturationLightness exposing (renderSaturationLightnessPicker)
+module Picker.SaturationLightness exposing (Model, Msg, init, subscriptions, update, view)
 
-import Color exposing (..)
+import Basics
+import Browser.Events exposing (onMouseUp)
+import Color exposing (Hsva, convertHsvaToRgba, sanitizeHsva, toCssColor)
 import Html exposing (Html, div)
 import Html.Events exposing (on)
 import Json.Decode as D
@@ -9,22 +11,95 @@ import Svg as S exposing (..)
 import Svg.Attributes as A exposing (..)
 
 
-type alias ClickPosition =
-    { offsetX : Int
-    , offsetY : Int
+
+---- Model ----
+
+
+type alias Model =
+    Bool
+
+
+init : Model
+init =
+    False
+
+
+
+---- UPDATE ----
+
+
+type Msg
+    = MouseDown MousePosition
+    | MouseMove MousePosition
+    | MouseUp
+
+
+type alias MousePosition =
+    { x : Int
+    , y : Int
     , width : Int
     , height : Int
     }
 
 
-renderSaturationLightnessPicker : Hsva -> (Hsva -> msg) -> Html msg
-renderSaturationLightnessPicker ({ hue, alpha } as color) msg =
+update : Hsva -> Msg -> Model -> ( Model, Hsva )
+update color msg model =
+    case msg of
+        MouseDown position ->
+            ( True, updateColor position color )
+
+        MouseMove position ->
+            case model of
+                True ->
+                    ( True, updateColor position color )
+
+                False ->
+                    ( False, color )
+
+        MouseUp ->
+            ( False, color )
+
+
+updateColor : MousePosition -> Hsva -> Hsva
+updateColor { x, y, width, height } color =
+    { color
+        | saturation = toFloat x / toFloat width
+        , value = 1.0 - (toFloat y / toFloat height)
+    }
+        |> sanitizeHsva
+
+
+
+---- SUBSCRIPTIONS ----
+
+
+subscriptions : Sub Msg
+subscriptions =
+    onMouseUp <| D.succeed MouseUp
+
+
+
+---- VIEW ----
+
+
+view : Hsva -> Model -> Html Msg
+view color model =
     let
+        svgOpacity =
+            String.fromFloat color.alpha
+
         gradientColor =
-            Hsva hue 1.0 1.0 1.0 |> fromHsva
+            Hsva color.hue 1.0 1.0 1.0 |> convertHsvaToRgba |> toCssColor
     in
-    div [ styles.class .checkerboard, handleClick color msg ]
-        [ svg [ height "200px", width "500px", opacity <| String.fromFloat alpha ]
+    div
+        (case model of
+            True ->
+                [ styles.class .checkerboard, onMouseMove MouseMove ]
+
+            False ->
+                [ styles.class .checkerboard, onMouseDown MouseDown ]
+        )
+        [ svg [ height "200px", width "500px", opacity svgOpacity ]
             [ defs []
                 [ linearGradient [ id "gradient-to-black", x1 "0%", x2 "0%", y1 "0%", y2 "100%" ]
                     [ stop [ offset "0%", stopColor "white" ] []
@@ -32,7 +107,7 @@ renderSaturationLightnessPicker ({ hue, alpha } as color) msg =
                     ]
                 , linearGradient [ id "gradient-to-color", x1 "0%", x2 "100%", y1 "0%", y2 "0%" ]
                     [ stop [ offset "0%", stopColor "white" ] []
-                    , stop [ offset "100%", stopColor <| toCssColor gradientColor ] []
+                    , stop [ offset "100%", stopColor gradientColor ] []
                     ]
                 , rect [ id "gradient-to-black-rect", width "100%", height "100%", fill "url(#gradient-to-black)" ] []
                 , rect [ id "gradient-to-color-rect", width "100%", height "100%", fill "url(#gradient-to-color)" ] []
@@ -47,22 +122,21 @@ renderSaturationLightnessPicker ({ hue, alpha } as color) msg =
         ]
 
 
-handleClick : Hsva -> (Hsva -> msg) -> Attribute msg
-handleClick color msg =
-    on "mousedown" <|
-        D.map msg <|
-            D.map (updateColor color) <|
-                D.map4 ClickPosition
-                    (D.field "offsetX" D.int)
-                    (D.field "offsetY" D.int)
-                    (D.field "offsetWidth" D.int |> D.at [ "currentTarget" ])
-                    (D.field "offsetHeight" D.int |> D.at [ "currentTarget" ])
+onMouseDown : (MousePosition -> Msg) -> Attribute Msg
+onMouseDown =
+    decodeMouseEvent >> on "mousedown"
 
 
-updateColor : Hsva -> ClickPosition -> Hsva
-updateColor { hue, alpha } position =
-    let
-        { offsetX, offsetY, width, height } =
-            position
-    in
-    Hsva hue (toFloat offsetX / toFloat width) (1.0 - (toFloat offsetY / toFloat height)) alpha
+onMouseMove : (MousePosition -> Msg) -> Attribute Msg
+onMouseMove =
+    decodeMouseEvent >> on "mousemove"
+
+
+decodeMouseEvent : (MousePosition -> Msg) -> D.Decoder Msg
+decodeMouseEvent toMsg =
+    D.map toMsg <|
+        D.map4 MousePosition
+            (D.field "offsetX" D.int)
+            (D.field "offsetY" D.int)
+            (D.field "offsetWidth" D.int |> D.at [ "currentTarget" ])
+            (D.field "offsetHeight" D.int |> D.at [ "currentTarget" ])

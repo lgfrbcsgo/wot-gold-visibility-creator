@@ -1,10 +1,27 @@
-module Picker exposing (renderPicker)
+module Picker exposing (Model, Msg, init, subscriptions, update, view)
 
-import Color exposing (Hsva)
-import Html exposing (Html)
-import Picker.SaturationLightness exposing (..)
+import Picker.SaturationLightness as SL
 
 
-renderPicker : Hsva -> (Hsva -> msg) -> Html msg
-renderPicker =
-    renderSaturationLightnessPicker
+type alias Model =
+    SL.Model
+
+
+init =
+    SL.init
+
+
+type alias Msg =
+    SL.Msg
+
+
+update =
+    SL.update
+
+
+subscriptions =
+    SL.subscriptions
+
+
+view =
+    SL.view

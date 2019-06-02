@@ -5,14 +5,11 @@ import Color exposing (..)
 import CssModules exposing (css)
 import Html exposing (..)
 import Html.Events exposing (..)
-import Picker exposing (..)
+import Picker as P
 
 
-styles =
-    css "./Main.css"
-        { btn = "btn"
-        , btnBlue = "btn-blue"
-        }
+
+---- PORTS ----
 
 
 port runWorker : Rgba -> Cmd msg
@@ -45,14 +42,14 @@ type Worker
 
 type alias Model =
     { color : Hsva
+    , picker : P.Model
     , worker : Worker
-    , previousColors : List Rgba
     }
 
 
 init : () -> ( Model, Cmd Msg )
-init flags =
-    ( Model (Hsva 360 1.0 1.0 0.5) Initial []
+init _ =
+    ( Model (Hsva 360 1.0 1.0 0.5) P.init Initial
     , Cmd.none
     )
 
@@ -64,7 +61,7 @@ init flags =
 type Msg
     = CreatePackage
     | GotPackage Package
-    | GotColor Hsva
+    | Picker P.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -78,8 +75,15 @@ update msg model =
             , savePackage package
             )
 
-        GotColor color ->
-            ( { model | color = color }
+        Picker pickerMsg ->
+            let
+                ( picker, color ) =
+                    P.update model.color pickerMsg model.picker
+            in
+            ( { model
+                | color = color
+                , picker = picker
+              }
             , Cmd.none
             )
 
@@ -95,8 +99,8 @@ createPackage model =
         Running ->
             ( model, Cmd.none )
 
-        Done { color, blobUrl } ->
-            ( Model model.color Running (color :: model.previousColors)
+        Done { blobUrl } ->
+            ( { model | worker = Running }
             , Cmd.batch
                 [ revokeBlob blobUrl
                 , runWorker <| convertHsvaToRgba model.color
@@ -117,8 +121,22 @@ savePackage package =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    getPackage GotPackage
+subscriptions _ =
+    Sub.batch
+        [ P.subscriptions |> Sub.map Picker
+        , getPackage GotPackage
+        ]
+
+
+
+---- STYLES ----
+
+
+styles =
+    css "./Main.css"
+        { btn = "btn"
+        , btnBlue = "btn-blue"
+        }
 
 
 
@@ -129,7 +147,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ button [ styles.class .btn, styles.class .btnBlue, onClick CreatePackage ] [ text "Run" ]
-        , renderPicker model.color GotColor
+        , P.view model.color model.picker |> map Picker
         ]
 
 
