@@ -71,7 +71,7 @@ const createConfig = (inProd, inDev) => ({
                                 purgecss({
                                     content: [
                                         './src/**/*.elm',
-                                        './src/**/*.html'
+                                        './src/**/*.ts'
                                     ],
                                 }),
                                 ...inProd([
@@ -104,8 +104,8 @@ const createConfig = (inProd, inDev) => ({
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: 'index.html'
+            filename: 'styles.css.html',
+            template: 'styles.css.html'
         }),
         new HtmlWebpackPlugin({
             filename: 'error.html',

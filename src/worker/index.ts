@@ -1,5 +1,5 @@
 import {wrap} from 'comlink';
-import {ColorOptions} from '../common';
+import {Color} from '../common';
 
 import forwardResource from '../../res/forward.png';
 import deferredResource from '../../res/deferred.png';
@@ -11,7 +11,7 @@ const worker = wrap(new Worker('./worker', {type: 'module'})) as PackageCreator;
 const loadForward = lazy(() => loadImageData(forwardResource));
 const loadDeferred = lazy(() => loadImageData(deferredResource));
 
-export async function runWorker(color: ColorOptions): Promise<any> {
+export async function runWorker(color: Color): Promise<any> {
     return await worker({
         color,
         forward: {

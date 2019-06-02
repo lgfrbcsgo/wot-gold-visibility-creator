@@ -1,5 +1,7 @@
 import {Elm} from './elm/Main';
-import {ColorOptions} from './common';
+import {Color} from './common';
+
+import './styles.css';
 
 const app = Elm.Main.init({
     node: document.getElementById('app')
@@ -13,7 +15,7 @@ function revokeBlob(blobUrl: string) {
     URL.revokeObjectURL(blobUrl);
 }
 
-async function runWorker(color: ColorOptions) {
+async function runWorker(color: Color) {
     const { runWorker } = await import('./worker');
     const buffer = await runWorker(color);
     const blob = new Blob([buffer]);
