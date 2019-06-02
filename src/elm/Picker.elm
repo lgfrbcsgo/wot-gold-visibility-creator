@@ -1,10 +1,10 @@
 module Picker exposing (renderPicker)
 
-import Color exposing (Color)
+import Color exposing (Hsva)
 import Html exposing (Html)
 import Picker.SaturationLightness exposing (..)
 
 
-renderPicker : Color -> (Color -> msg) -> Html msg
+renderPicker : Hsva -> (Hsva -> msg) -> Html msg
 renderPicker =
     renderSaturationLightnessPicker

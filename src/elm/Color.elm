@@ -1,4 +1,4 @@
-module Color exposing (Color, Hsva, Rgba, fromHsva, fromRgba, toCssColor, toHsva, toRgba)
+module Color exposing (Color, Hsva, Rgba, convertHsvaToRgba, convertRgbaToHsva, fromHsva, fromRgba, toCssColor, toHsva, toRgba)
 
 
 type Color
@@ -66,7 +66,7 @@ toRgba color =
             rgba
 
         IHsva hsva ->
-            convertToRgba hsva
+            convertHsvaToRgba hsva
 
 
 toHsva : Color -> Hsva
@@ -76,7 +76,7 @@ toHsva color =
             hsva
 
         IRgba rgba ->
-            convertToHsva rgba
+            convertRgbaToHsva rgba
 
 
 fModBy : Float -> Int -> Float
@@ -88,8 +88,8 @@ fModBy f n =
     toFloat (modBy n integer) + f - toFloat integer
 
 
-convertToHsva : Rgba -> Hsva
-convertToHsva { red, green, blue, alpha } =
+convertRgbaToHsva : Rgba -> Hsva
+convertRgbaToHsva { red, green, blue, alpha } =
     let
         r =
             toFloat red / 255
@@ -132,8 +132,8 @@ convertToHsva { red, green, blue, alpha } =
     Hsva (round h) s cMax alpha
 
 
-convertToRgba : Hsva -> Rgba
-convertToRgba { hue, saturation, value, alpha } =
+convertHsvaToRgba : Hsva -> Rgba
+convertHsvaToRgba { hue, saturation, value, alpha } =
     let
         h =
             modBy 360 hue

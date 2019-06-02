@@ -2,21 +2,28 @@ module Picker.SaturationLightness exposing (renderSaturationLightnessPicker)
 
 import Color exposing (..)
 import Html exposing (Html, div)
+import Html.Events exposing (on)
+import Json.Decode as D
 import Picker.Styles exposing (styles)
 import Svg as S exposing (..)
 import Svg.Attributes as A exposing (..)
 
 
-renderSaturationLightnessPicker : Color -> (Color -> msg) -> Html msg
-renderSaturationLightnessPicker color msg =
-    let
-        { hue, alpha } =
-            toHsva color
+type alias ClickPosition =
+    { offsetX : Int
+    , offsetY : Int
+    , width : Int
+    , height : Int
+    }
 
+
+renderSaturationLightnessPicker : Hsva -> (Hsva -> msg) -> Html msg
+renderSaturationLightnessPicker ({ hue, alpha } as color) msg =
+    let
         gradientColor =
             Hsva hue 1.0 1.0 1.0 |> fromHsva
     in
-    div [ styles.class .checkerboard ]
+    div [ styles.class .checkerboard, handleClick color msg ]
         [ svg [ height "200px", width "500px", opacity <| String.fromFloat alpha ]
             [ defs []
                 [ linearGradient [ id "gradient-to-black", x1 "0%", x2 "0%", y1 "0%", y2 "100%" ]
@@ -38,3 +45,24 @@ renderSaturationLightnessPicker color msg =
             , rect [ A.filter "url(#gradient-multiply)", x "0", y "0", width "100%", height "100%" ] []
             ]
         ]
+
+
+handleClick : Hsva -> (Hsva -> msg) -> Attribute msg
+handleClick color msg =
+    on "mousedown" <|
+        D.map msg <|
+            D.map (updateColor color) <|
+                D.map4 ClickPosition
+                    (D.field "offsetX" D.int)
+                    (D.field "offsetY" D.int)
+                    (D.field "offsetWidth" D.int |> D.at [ "currentTarget" ])
+                    (D.field "offsetHeight" D.int |> D.at [ "currentTarget" ])
+
+
+updateColor : Hsva -> ClickPosition -> Hsva
+updateColor { hue, alpha } position =
+    let
+        { offsetX, offsetY, width, height } =
+            position
+    in
+    Hsva hue (toFloat offsetX / toFloat width) (1.0 - (toFloat offsetY / toFloat height)) alpha

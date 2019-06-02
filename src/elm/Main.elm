@@ -44,7 +44,7 @@ type Worker
 
 
 type alias Model =
-    { color : Rgba
+    { color : Hsva
     , worker : Worker
     , previousColors : List Rgba
     }
@@ -52,7 +52,7 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init flags =
-    ( Model (Rgba 255 100 0 0.5) Initial []
+    ( Model (Hsva 360 1.0 1.0 0.5) Initial []
     , Cmd.none
     )
 
@@ -64,7 +64,7 @@ init flags =
 type Msg
     = CreatePackage
     | GotPackage Package
-    | GotColor Rgba
+    | GotColor Hsva
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -79,7 +79,9 @@ update msg model =
             )
 
         GotColor color ->
-            ( model, Cmd.none )
+            ( { model | color = color }
+            , Cmd.none
+            )
 
 
 createPackage : Model -> ( Model, Cmd Msg )
@@ -87,7 +89,7 @@ createPackage model =
     case model.worker of
         Initial ->
             ( { model | worker = Running }
-            , runWorker model.color
+            , runWorker <| convertHsvaToRgba model.color
             )
 
         Running ->
@@ -97,7 +99,7 @@ createPackage model =
             ( Model model.color Running (color :: model.previousColors)
             , Cmd.batch
                 [ revokeBlob blobUrl
-                , runWorker model.color
+                , runWorker <| convertHsvaToRgba model.color
                 ]
             )
 
@@ -127,7 +129,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ button [ styles.class .btn, styles.class .btnBlue, onClick CreatePackage ] [ text "Run" ]
-        , renderPicker (fromRgba model.color) (\color -> toRgba color |> GotColor)
+        , renderPicker model.color GotColor
         ]
 
 
