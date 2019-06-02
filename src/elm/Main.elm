@@ -1,10 +1,11 @@
 port module Main exposing (main)
 
 import Browser
-import Color exposing (RGBA)
+import Color exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
-import Styles exposing (styles)
+import Picker.SaturationLightness exposing (..)
+import Styles exposing (..)
 
 
 port runWorker : RGBA -> Cmd msg
@@ -56,6 +57,7 @@ init flags =
 type Msg
     = CreatePackage
     | GotPackage Package
+    | GotColor HSVA
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -68,6 +70,9 @@ update msg model =
             ( { model | worker = Done package }
             , savePackage package
             )
+
+        GotColor color ->
+            ( model, Cmd.none )
 
 
 createPackage : Model -> ( Model, Cmd Msg )
@@ -115,6 +120,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ button [ styles.class .btn, styles.class .btnBlue, onClick CreatePackage ] [ text "Run" ]
+        , renderSaturationLightnessPicker (toHSVA model.color) GotColor
         ]
 
 

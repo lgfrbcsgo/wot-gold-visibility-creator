@@ -23,7 +23,7 @@ fModBy f n =
         integer =
             floor f
     in
-    toFloat (modBy integer n) + f - toFloat integer
+    toFloat (modBy n integer) + f - toFloat integer
 
 
 toHSVA : RGBA -> HSVA
@@ -48,17 +48,17 @@ toHSVA { red, green, blue, alpha } =
             cMax - cMin
 
         h =
-            if cMax == r then
+            if c == 0.0 then
+                0.0
+
+            else if cMax == r then
                 60 * fModBy ((g - b) / c) 6
 
             else if cMax == g then
                 60 * ((b - r) / c + 2)
 
-            else if cMax == b then
-                60 * ((r - g) / c + 4)
-
             else
-                0.0
+                60 * ((r - g) / c + 4)
 
         s =
             if cMax == 0.0 then

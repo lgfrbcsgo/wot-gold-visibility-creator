@@ -1,1 +1,1 @@
-module Knob exposing (..)
+module Picker.Knob exposing (..)
