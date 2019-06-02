@@ -86,14 +86,16 @@ const createConfig = (inProd, inDev) => ({
                 ]
             },
             {
-                test: /\.png$/,
+                test: /\.(png|svg)$/,
                 use: [
                     {
-                        loader: 'file-loader',
+                        loader: 'url-loader',
                         options: {
+                            limit: 8192,
+                            fallback: 'file-loader',
                             name: '[hash].[ext]'
-                        },
-                    },
+                        }
+                    }
                 ],
             }
         ]
