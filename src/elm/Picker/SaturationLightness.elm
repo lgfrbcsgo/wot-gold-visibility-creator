@@ -1,13 +1,20 @@
 module Picker.SaturationLightness exposing (renderSaturationLightnessPicker)
 
-import Color exposing (HSVA)
+import Color exposing (..)
 import Html exposing (Html)
 import Svg as S exposing (..)
 import Svg.Attributes as A exposing (..)
 
 
-renderSaturationLightnessPicker : HSVA -> (HSVA -> msg) -> Html msg
+renderSaturationLightnessPicker : Color -> (Color -> msg) -> Html msg
 renderSaturationLightnessPicker color msg =
+    let
+        { hue, alpha } =
+            toHsva color
+
+        gradientColor =
+            Hsva hue 1.0 1.0 alpha |> fromHsva |> toCssColor
+    in
     svg [ height "200px", width "500px" ]
         [ defs []
             [ linearGradient [ id "gradient-to-black", x1 "0%", x2 "0%", y1 "0%", y2 "100%" ]
@@ -16,7 +23,7 @@ renderSaturationLightnessPicker color msg =
                 ]
             , linearGradient [ id "gradient-to-color", x1 "0%", x2 "100%", y1 "0%", y2 "0%" ]
                 [ stop [ offset "0%", stopColor "white" ] []
-                , stop [ offset "100%", stopColor "red" ] [] -- TODO other colors
+                , stop [ offset "100%", stopColor gradientColor ] []
                 ]
             , rect [ id "gradient-to-black-rect", width "100%", height "100%", fill "url(#gradient-to-black)" ] []
             , rect [ id "gradient-to-color-rect", width "100%", height "100%", fill "url(#gradient-to-color)" ] []

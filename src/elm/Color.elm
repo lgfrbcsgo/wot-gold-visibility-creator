@@ -1,7 +1,12 @@
-module Color exposing (HSVA, RGBA, toHSVA, toRGBA)
+module Color exposing (Color, Hsva, Rgba, fromHsva, fromRgba, toCssColor, toHsva, toRgba)
 
 
-type alias RGBA =
+type Color
+    = IRgba Rgba
+    | IHsva Hsva
+
+
+type alias Rgba =
     { red : Int
     , green : Int
     , blue : Int
@@ -9,12 +14,69 @@ type alias RGBA =
     }
 
 
-type alias HSVA =
+type alias Hsva =
     { hue : Int
     , saturation : Float
     , value : Float
     , alpha : Float
     }
+
+
+fromRgba : Rgba -> Color
+fromRgba { red, green, blue, alpha } =
+    IRgba
+        { red = red |> min 255 |> max 0
+        , green = green |> min 255 |> max 0
+        , blue = blue |> min 255 |> max 0
+        , alpha = alpha |> min 1.0 |> max 0.0
+        }
+
+
+fromHsva : Hsva -> Color
+fromHsva { hue, saturation, value, alpha } =
+    IHsva
+        { hue = hue
+        , saturation = saturation |> min 1.0 |> max 0.0
+        , value = value |> min 1.0 |> max 0.0
+        , alpha = alpha |> min 1.0 |> max 0.0
+        }
+
+
+toCssColor : Color -> String
+toCssColor color =
+    let
+        { red, green, blue, alpha } =
+            toRgba color
+    in
+    "rgba("
+        ++ String.fromInt red
+        ++ ","
+        ++ String.fromInt green
+        ++ ","
+        ++ String.fromInt blue
+        ++ ","
+        ++ String.fromFloat alpha
+        ++ ")"
+
+
+toRgba : Color -> Rgba
+toRgba color =
+    case color of
+        IRgba rgba ->
+            rgba
+
+        IHsva hsva ->
+            convertToRgba hsva
+
+
+toHsva : Color -> Hsva
+toHsva color =
+    case color of
+        IHsva hsva ->
+            hsva
+
+        IRgba rgba ->
+            convertToHsva rgba
 
 
 fModBy : Float -> Int -> Float
@@ -26,8 +88,8 @@ fModBy f n =
     toFloat (modBy n integer) + f - toFloat integer
 
 
-toHSVA : RGBA -> HSVA
-toHSVA { red, green, blue, alpha } =
+convertToHsva : Rgba -> Hsva
+convertToHsva { red, green, blue, alpha } =
     let
         r =
             toFloat red / 255
@@ -67,42 +129,45 @@ toHSVA { red, green, blue, alpha } =
             else
                 c / cMax
     in
-    HSVA (floor h) s cMax alpha
+    Hsva (round h) s cMax alpha
 
 
-toRGBA : HSVA -> RGBA
-toRGBA { hue, saturation, value, alpha } =
+convertToRgba : Hsva -> Rgba
+convertToRgba { hue, saturation, value, alpha } =
     let
+        h =
+            modBy 360 hue
+
         c =
             value * saturation
 
         x =
-            c * (1 - abs (fModBy (toFloat hue / 60) 2 - 1))
+            c * (1 - abs (fModBy (toFloat h / 60) 2 - 1))
 
         m =
             value - c
 
         ( r, g, b ) =
-            if hue < 60 then
+            if h < 60 then
                 ( c, x, 0 )
 
-            else if hue < 120 then
+            else if h < 120 then
                 ( x, c, 0 )
 
-            else if hue < 180 then
+            else if h < 180 then
                 ( 0, c, x )
 
-            else if hue < 240 then
+            else if h < 240 then
                 ( 0, x, c )
 
-            else if hue < 300 then
+            else if h < 300 then
                 ( x, 0, c )
 
             else
                 ( c, 0, x )
     in
-    RGBA
-        (floor (r + m) * 255)
-        (floor (g + m) * 255)
-        (floor (b + m) * 255)
+    Rgba
+        (round ((r + m) * 255))
+        (round ((g + m) * 255))
+        (round ((b + m) * 255))
         alpha

@@ -8,7 +8,7 @@ import Picker.SaturationLightness exposing (..)
 import Styles exposing (..)
 
 
-port runWorker : RGBA -> Cmd msg
+port runWorker : Rgba -> Cmd msg
 
 
 port revokeBlob : String -> Cmd msg
@@ -25,7 +25,7 @@ port getPackage : (Package -> msg) -> Sub msg
 
 
 type alias Package =
-    { color : RGBA
+    { color : Rgba
     , blobUrl : String
     }
 
@@ -37,15 +37,15 @@ type Worker
 
 
 type alias Model =
-    { color : RGBA
+    { color : Rgba
     , worker : Worker
-    , previousColors : List RGBA
+    , previousColors : List Rgba
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init flags =
-    ( Model (RGBA 255 0 0 1.0) Initial []
+    ( Model (Rgba 255 100 0 1.0) Initial []
     , Cmd.none
     )
 
@@ -57,7 +57,7 @@ init flags =
 type Msg
     = CreatePackage
     | GotPackage Package
-    | GotColor HSVA
+    | GotColor Rgba
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -120,7 +120,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ button [ styles.class .btn, styles.class .btnBlue, onClick CreatePackage ] [ text "Run" ]
-        , renderSaturationLightnessPicker (toHSVA model.color) GotColor
+        , renderSaturationLightnessPicker (fromRgba model.color) (\color -> toRgba color |> GotColor)
         ]
 
 
