@@ -24,10 +24,10 @@ pub mod errors {
 }
 use errors::CreateResult;
 
-pub struct ColorOptions {
-    pub red: f32,
-    pub green: f32,
-    pub blue: f32,
+pub struct Color {
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
     pub alpha: f32
 }
 
@@ -43,7 +43,7 @@ pub struct TextureOptions {
 }
 
 pub struct PackageOptions {
-    pub color: ColorOptions,
+    pub color: Color,
     pub forward: TextureOptions,
     pub deferred: TextureOptions
 }
@@ -69,19 +69,20 @@ pub fn create_package(options: PackageOptions) -> CreateResult<Vec<u8>> {
     Ok(cursor.into_inner())
 }
 
-fn create_texture(color: &ColorOptions, mut image_data: ImageData) -> CreateResult<Vec<u8>> {
-    let ColorOptions { red, green, blue, alpha } = color;
+fn create_texture(color: &Color, mut image_data: ImageData) -> CreateResult<Vec<u8>> {
+    let Color { red, green, blue, alpha } = color;
 
-    let red = (*red * 255.) as u8;
-    let green = (*green * 255.) as u8;
-    let blue = (*blue * 255.) as u8;
+    let red = *red;
+    let green = *green;
+    let blue = *blue;
+    let alpha = *alpha;
 
     for index in 0..image_data.data.len() {
         image_data.data[index] = match index % 4 {
             0 => red,
             1 => green,
             2 => blue,
-            _ => (*alpha * image_data.data[index] as f32) as u8,
+            _ => (alpha * image_data.data[index] as f32) as u8,
         };
     }
 

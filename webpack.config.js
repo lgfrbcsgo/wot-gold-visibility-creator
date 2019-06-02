@@ -104,8 +104,8 @@ const createConfig = (inProd, inDev) => ({
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            filename: 'styles.css.html',
-            template: 'styles.css.html'
+            filename: 'index.html',
+            template: 'index.html'
         }),
         new HtmlWebpackPlugin({
             filename: 'error.html',

@@ -16,24 +16,24 @@ pub fn use_panic_hook() {
 
 #[wasm_bindgen]
 extern "C" {
-    pub type JsColorOptions;
+    pub type JsColor;
 
     #[wasm_bindgen(method, getter)]
-    fn red(this: &JsColorOptions) -> f32;
+    fn red(this: &JsColor) -> u8;
 
     #[wasm_bindgen(method, getter)]
-    fn green(this: &JsColorOptions) -> f32;
+    fn green(this: &JsColor) -> u8;
 
     #[wasm_bindgen(method, getter)]
-    fn blue(this: &JsColorOptions) -> f32;
+    fn blue(this: &JsColor) -> u8;
 
     #[wasm_bindgen(method, getter)]
-    fn alpha(this: &JsColorOptions) -> f32;
+    fn alpha(this: &JsColor) -> f32;
 }
 
-impl From<JsColorOptions> for creator::ColorOptions {
-    fn from(color: JsColorOptions) -> Self {
-        creator::ColorOptions {
+impl From<JsColor> for creator::Color {
+    fn from(color: JsColor) -> Self {
+        creator::Color {
             red: color.red(),
             green: color.green(),
             blue: color.blue(),
@@ -73,7 +73,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     fn path(this: &JsTextureOptions) -> String;
 
-    #[wasm_bindgen(method, getter = JsImageData)]
+    #[wasm_bindgen(method, getter = imageData)]
     fn image_data(this: &JsTextureOptions) -> JsImageData;
 }
 
@@ -91,7 +91,7 @@ extern "C" {
     pub type JsPackageOptions;
 
     #[wasm_bindgen(method, getter)]
-    fn color(this: &JsPackageOptions) -> JsColorOptions;
+    fn color(this: &JsPackageOptions) -> JsColor;
 
     #[wasm_bindgen(method, getter)]
     fn forward(this: &JsPackageOptions) -> JsTextureOptions;
