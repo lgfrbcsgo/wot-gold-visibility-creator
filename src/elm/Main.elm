@@ -2,10 +2,17 @@ port module Main exposing (main)
 
 import Browser
 import Color exposing (..)
+import CssModules exposing (css)
 import Html exposing (..)
 import Html.Events exposing (..)
-import Picker.SaturationLightness exposing (..)
-import Styles exposing (..)
+import Picker exposing (..)
+
+
+styles =
+    css "./Main.css"
+        { btn = "btn"
+        , btnBlue = "btn-blue"
+        }
 
 
 port runWorker : Rgba -> Cmd msg
@@ -45,7 +52,7 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init flags =
-    ( Model (Rgba 255 100 0 1.0) Initial []
+    ( Model (Rgba 255 100 0 0.5) Initial []
     , Cmd.none
     )
 
@@ -120,7 +127,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ button [ styles.class .btn, styles.class .btnBlue, onClick CreatePackage ] [ text "Run" ]
-        , renderSaturationLightnessPicker (fromRgba model.color) (\color -> toRgba color |> GotColor)
+        , renderPicker (fromRgba model.color) (\color -> toRgba color |> GotColor)
         ]
 
 
