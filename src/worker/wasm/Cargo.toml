@@ -2,7 +2,7 @@
 authors = ["lgfrbcsgo"]
 license = "Apache-2.0/MIT"
 name = "gold-visibility-creator-wasm"
-version = "1.0.0"
+version = "0.0.0"
 edition = "2018"
 
 [lib]

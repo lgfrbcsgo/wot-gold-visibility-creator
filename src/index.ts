@@ -1,4 +1,4 @@
-import {Elm} from './elm/Main';
+import {Elm} from './app/Main';
 import {Color} from './common';
 
 import './styles.css';

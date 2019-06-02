@@ -107,7 +107,7 @@ dependencies = [
 
 [[package]]
 name = "gold-visibility-creator-wasm"
-version = "1.0.0"
+version = "0.0.0"
 dependencies = [
  "console_error_panic_hook 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "ddsfile 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
