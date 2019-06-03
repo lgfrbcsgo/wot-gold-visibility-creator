@@ -1,28 +1,33 @@
-import {wrap} from 'comlink';
-import {Color} from '../common';
+import {wrap, transfer} from 'comlink';
+import {IRgba} from '../common';
 
-import forwardResource from '../../res/forward.png';
-import deferredResource from '../../res/deferred.png';
-import config from '../../res/config.json';
-import {PackageCreator} from "./common";
+import packageConfig from '../../res/package.config.json';
+import {ITextureConfig, IWorkerInitializer} from "./interface";
 
-const worker = wrap(new Worker('./worker', {type: 'module'})) as PackageCreator;
 
-const loadForward = lazy(() => loadImageData(forwardResource));
-const loadDeferred = lazy(() => loadImageData(deferredResource));
+const initializeWorker = wrap<IWorkerInitializer>(
+    new Worker('./worker', {type: 'module'})
+);
 
-export async function runWorker(color: Color): Promise<any> {
-    return await worker({
-        color,
-        forward: {
-            imageData: await loadForward(),
-            path: config.paths.forward
-        },
-        deferred: {
-            imageData: await loadDeferred(),
-            path: config.paths.deferred
-        }
+const createWorkerConfig = cache(async () : Promise<ITextureConfig[]> => {
+    const textures = packageConfig.textures.map(async ({ src, packagePath }) => {
+        const textureConfig: ITextureConfig = {
+            packagePath,
+            imageData: await loadImageData(require('../../res/' + src))
+        };
+        return transfer(textureConfig, [textureConfig.imageData.data.buffer]);
     });
+    return await Promise.all(textures);
+});
+
+const createWorker = cache(async () => {
+    const config = await createWorkerConfig();
+    return await initializeWorker(config);
+});
+
+export async function createModPackage(color: IRgba): Promise<Uint8Array> {
+    const worker = await createWorker();
+    return await worker.create(color);
 }
 
 async function loadImageData(url: string): Promise<ImageData> {
@@ -59,7 +64,7 @@ async function loadImage(url: string): Promise<HTMLImageElement | ImageBitmap> {
     }
 }
 
-function lazy<T, V>(innerFunc: () => V) {
+function cache<T, V>(innerFunc: () => V) {
     let result: V;
     let didRun = false;
     return () => {

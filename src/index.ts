@@ -1,5 +1,5 @@
 import {Elm} from './app/Main';
-import {Color} from './common';
+import {IRgba} from './common';
 
 import './styles.css';
 
@@ -15,9 +15,9 @@ function revokeBlob(blobUrl: string) {
     URL.revokeObjectURL(blobUrl);
 }
 
-async function runWorker(color: Color) {
-    const { runWorker } = await import('./worker');
-    const buffer = await runWorker(color);
+async function runWorker(color: IRgba) {
+    const { createModPackage } = await import('./worker');
+    const buffer = await createModPackage(color);
     const blob = new Blob([buffer]);
     app.ports.getPackage.send({
         color,

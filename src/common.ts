@@ -1,4 +1,4 @@
-export interface Color {
+export interface IRgba {
     red: number;
     green: number;
     blue: number;

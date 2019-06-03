@@ -1,6 +1,8 @@
 use wasm_bindgen::prelude::*;
 
 mod creator;
+use creator::*;
+
 
 #[macro_use]
 extern crate error_chain;
@@ -13,6 +15,10 @@ pub fn use_panic_hook() {
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
 }
+
+
+// JS imports
+
 
 #[wasm_bindgen]
 extern "C" {
@@ -31,13 +37,13 @@ extern "C" {
     fn alpha(this: &JsColor) -> f32;
 }
 
-impl From<JsColor> for creator::Color {
-    fn from(color: JsColor) -> Self {
-        creator::Color {
-            red: color.red(),
-            green: color.green(),
-            blue: color.blue(),
-            alpha: color.alpha()
+impl Into<Color> for JsColor {
+    fn into(self) -> Color {
+        Color {
+            red: self.red(),
+            green: self.green(),
+            blue: self.blue(),
+            alpha: self.alpha()
         }
     }
 }
@@ -56,62 +62,75 @@ extern "C" {
     fn width(this: &JsImageData) -> u32;
 }
 
-impl From<JsImageData> for creator::ImageData {
-    fn from(image_data: JsImageData) -> Self {
-        creator::ImageData {
-            data: image_data.data(),
-            height: image_data.height(),
-            width: image_data.width()
+impl Into<ImageData> for JsImageData {
+    fn into(self) -> ImageData {
+        ImageData {
+            data: self.data(),
+            height: self.height(),
+            width: self.width()
         }
     }
 }
 
 #[wasm_bindgen]
 extern "C" {
-    pub type JsTextureOptions;
+    pub type JsTextureConfig;
 
-    #[wasm_bindgen(method, getter)]
-    fn path(this: &JsTextureOptions) -> String;
+    #[wasm_bindgen(method, getter = packagePath)]
+    fn package_path(this: &JsTextureConfig) -> String;
 
     #[wasm_bindgen(method, getter = imageData)]
-    fn image_data(this: &JsTextureOptions) -> JsImageData;
+    fn image_data(this: &JsTextureConfig) -> JsImageData;
 }
 
-impl From<JsTextureOptions> for creator::TextureOptions {
-    fn from(texture: JsTextureOptions) -> Self {
-        creator::TextureOptions {
-            path: texture.path(),
-            image_data: texture.image_data().into()
+impl Into<TextureConfig> for JsTextureConfig {
+    fn into(self) -> TextureConfig {
+        TextureConfig {
+            package_path: self.package_path(),
+            image_data: self.image_data().into()
         }
     }
 }
 
 #[wasm_bindgen]
 extern "C" {
-    pub type JsPackageOptions;
+    pub type JsTextureConfigArray;
+
+    #[wasm_bindgen(method, structural, indexing_getter)]
+    fn get(this: &JsTextureConfigArray, index: u32) -> JsTextureConfig;
 
     #[wasm_bindgen(method, getter)]
-    fn color(this: &JsPackageOptions) -> JsColor;
-
-    #[wasm_bindgen(method, getter)]
-    fn forward(this: &JsPackageOptions) -> JsTextureOptions;
-
-    #[wasm_bindgen(method, getter)]
-    fn deferred(this: &JsPackageOptions) -> JsTextureOptions;
+    fn length(this: &JsTextureConfigArray) -> u32;
 }
 
-impl From<JsPackageOptions> for creator::PackageOptions {
-    fn from(package: JsPackageOptions) -> Self {
-        creator::PackageOptions {
-            color: package.color().into(),
-            forward: package.forward().into(),
-            deferred: package.deferred().into()
-        }
+impl Into<Vec<TextureConfig>> for JsTextureConfigArray {
+    fn into(self) -> Vec<TextureConfig> {
+        let range = 0..self.length();
+        range
+            .map(|index| self.get(index).into())
+            .collect::<Vec<TextureConfig>>()
     }
 }
 
+// Rust exports
+
+
 #[wasm_bindgen]
-pub fn create_package(options: JsPackageOptions) -> Vec<u8> {
-    use_panic_hook();
-    creator::create_package(options.into()).unwrap_throw()
+struct Worker {
+    texture_configs: Vec<TextureConfig>
+}
+
+#[wasm_bindgen]
+impl Worker {
+    #[wasm_bindgen(constructor)]
+    pub fn new(textures: JsTextureConfigArray) -> Worker {
+        Worker {
+            texture_configs: textures.into()
+        }
+    }
+
+    pub fn create(&self, color: JsColor) -> Vec<u8> {
+        create_package(&self.texture_configs, &color.into())
+            .unwrap_throw()
+    }
 }
