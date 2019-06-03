@@ -1,6 +1,6 @@
 .checkerboard {
     width: 500px;
     height: 200px;
-    background: #BFBFBF url('../../../assets/checkerboard.svg');
+    background: #BFBFBF url('../../../res/assets/checkerboard.svg');
     background-size: 16px 16px;
 }

@@ -1,9 +1,8 @@
 import {wrap, transfer} from 'comlink';
 import {IRgba} from '../common';
 
-import packageConfig from '../../res/package.config.json';
+import packageConfig from '../../res/worker/package.config.json';
 import {ITextureConfig, IWorkerInitializer} from "./interface";
-
 
 const initializeWorker = wrap<IWorkerInitializer>(
     new Worker('./worker', {type: 'module'})
@@ -13,7 +12,7 @@ const createWorkerConfig = cache(async () : Promise<ITextureConfig[]> => {
     const textures = packageConfig.textures.map(async ({ src, packagePath }) => {
         const textureConfig: ITextureConfig = {
             packagePath,
-            imageData: await loadImageData(require('../../res/' + src))
+            imageData: await loadImageData(require('../../res/worker/' + src))
         };
         return transfer(textureConfig, [textureConfig.imageData.data.buffer]);
     });
