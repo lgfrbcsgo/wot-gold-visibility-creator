@@ -69,26 +69,19 @@ pub fn create_package(texture_configs: &Vec<TextureConfig>, color: &Color) -> Cr
     Ok(cursor.into_inner())
 }
 
-fn create_texture_data(color: &Color, source: &Vec<u8>) -> Vec<u8> {
+fn create_texture_data(color: &Color, data: &Vec<u8>) -> Vec<u8> {
     let Color { red, green, blue, alpha } = color;
 
-    let red = *red;
-    let green = *green;
-    let blue = *blue;
-    let alpha = *alpha;
-
-    let mut dest: Vec<u8> = Vec::new();
-
-    for index in 0..source.len() {
-        dest.push(match index % 4 {
-            0 => red,
-            1 => green,
-            2 => blue,
-            _ => (alpha * source[index] as f32) as u8,
-        })
-    };
-
-    dest
+    data
+        .iter()
+        .enumerate()
+        .map(|(index, value)| (match index % 4 {
+            0 => *red,
+            1 => *green,
+            2 => *blue,
+            _ => (*alpha * *value as f32) as u8,
+        }))
+        .collect::<Vec<u8>>()
 }
 
 fn encode_dds(image_data: &ImageData) -> CreateResult<Vec<u8>> {

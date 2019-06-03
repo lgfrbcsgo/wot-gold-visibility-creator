@@ -8,14 +8,14 @@ const app = Elm.Main.init({
 });
 
 app.ports.revokeBlob.subscribe(revokeBlob);
-app.ports.runWorker.subscribe(color => runWorker(color).catch(rethrowError));
+app.ports.runWorker.subscribe(color => createModPackage(color).catch(rethrowError));
 app.ports.saveBlob.subscribe(({ blobUrl, fileName }) => saveBlob(blobUrl, fileName));
 
 function revokeBlob(blobUrl: string) {
     URL.revokeObjectURL(blobUrl);
 }
 
-async function runWorker(color: IRgba) {
+async function createModPackage(color: IRgba) {
     const { createModPackage } = await import('./worker');
     const buffer = await createModPackage(color);
     const blob = new Blob([buffer]);
