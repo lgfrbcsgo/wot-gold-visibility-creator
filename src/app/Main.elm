@@ -54,9 +54,14 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         CreateModPackage ->
-            ( { model | running = True }
-            , createModPackage model.color
-            )
+            case model.running of
+                False ->
+                    ( { model | running = True }
+                    , createModPackage model.color
+                    )
+
+                True ->
+                    ( model, Cmd.none )
 
         FinishedModPackage ->
             ( { model | running = False }
