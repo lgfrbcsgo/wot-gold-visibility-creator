@@ -2,7 +2,7 @@ module Picker.SaturationLightness exposing (Model, Msg, init, subscriptions, upd
 
 import Basics
 import Browser.Events exposing (onMouseUp)
-import Color exposing (Hsva, convertHsvaToRgba, sanitizeHsva, toCssColor)
+import Color exposing (Hsva, HsvaRecord, fromHsva, hsva, hsvaToRgba, rgbaToCss)
 import Html exposing (Html, div)
 import Html.Events exposing (on)
 import Json.Decode as D
@@ -62,11 +62,15 @@ update color msg model =
 
 updateColor : MousePosition -> Hsva -> Hsva
 updateColor { x, y, width, height } color =
-    { color
-        | saturation = toFloat x / toFloat width
-        , value = 1.0 - (toFloat y / toFloat height)
-    }
-        |> sanitizeHsva
+    let
+        hsvaRecord =
+            fromHsva color
+    in
+    hsva
+        { hsvaRecord
+            | saturation = toFloat x / toFloat width
+            , value = 1.0 - (toFloat y / toFloat height)
+        }
 
 
 
@@ -85,11 +89,17 @@ subscriptions =
 view : Hsva -> Model -> Html Msg
 view color model =
     let
+        alpha =
+            color |> fromHsva |> .alpha
+
+        hue =
+            color |> fromHsva |> .hue
+
         svgOpacity =
-            String.fromFloat color.alpha
+            alpha |> String.fromFloat
 
         gradientColor =
-            Hsva color.hue 1.0 1.0 1.0 |> convertHsvaToRgba |> toCssColor
+            HsvaRecord hue 1.0 1.0 1.0 |> hsva |> hsvaToRgba |> rgbaToCss
     in
     div
         (case model of

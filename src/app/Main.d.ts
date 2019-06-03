@@ -1,4 +1,4 @@
-import {ColorOptions} from "../common";
+import {IRgba} from "../common";
 
 interface PortToElm<T> {
     send(value: T) : void;
@@ -12,10 +12,8 @@ export namespace Elm {
     namespace Main {
         export interface App {
             ports: {
-                runWorker: PortFromElm<ColorOptions>,
-                revokeBlob: PortFromElm<string>,
-                saveBlob: PortFromElm<{ blobUrl: string, fileName: string }>
-                getPackage: PortToElm<{ color: ColorOptions, blobUrl: string }>
+                startWorker: PortFromElm<IRgba>,
+                finishedModPackage: PortToElm<void>
             };
         }
         export function init(options: {

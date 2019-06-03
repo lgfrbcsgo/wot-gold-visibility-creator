@@ -1,15 +1,19 @@
 module Color exposing
     ( Hsva
+    , HsvaRecord
     , Rgba
-    , convertHsvaToRgba
-    , convertRgbaToHsva
-    , sanitizeHsva
-    , sanitizeRgba
-    , toCssColor
+    , RgbaRecord
+    , fromHsva
+    , fromRgba
+    , hsva
+    , hsvaToRgba
+    , rgba
+    , rgbaToCss
+    , rgbaToHsva
     )
 
 
-type alias Rgba =
+type alias RgbaRecord =
     { red : Int
     , green : Int
     , blue : Int
@@ -17,7 +21,7 @@ type alias Rgba =
     }
 
 
-type alias Hsva =
+type alias HsvaRecord =
     { hue : Int
     , saturation : Float
     , value : Float
@@ -25,48 +29,46 @@ type alias Hsva =
     }
 
 
-sanitizeRgba : Rgba -> Rgba
-sanitizeRgba { red, green, blue, alpha } =
-    { red = red |> min 255 |> max 0
-    , green = green |> min 255 |> max 0
-    , blue = blue |> min 255 |> max 0
-    , alpha = alpha |> min 1.0 |> max 0.0
-    }
+type Rgba
+    = Rgba RgbaRecord
 
 
-sanitizeHsva : Hsva -> Hsva
-sanitizeHsva { hue, saturation, value, alpha } =
-    { hue = hue
-    , saturation = saturation |> min 1.0 |> max 0.0
-    , value = value |> min 1.0 |> max 0.0
-    , alpha = alpha |> min 1.0 |> max 0.0
-    }
+type Hsva
+    = Hsva HsvaRecord
 
 
-toCssColor : Rgba -> String
-toCssColor { red, green, blue, alpha } =
-    "rgba("
-        ++ String.fromInt red
-        ++ ","
-        ++ String.fromInt green
-        ++ ","
-        ++ String.fromInt blue
-        ++ ","
-        ++ String.fromFloat alpha
-        ++ ")"
+rgba : RgbaRecord -> Rgba
+rgba { red, green, blue, alpha } =
+    Rgba
+        { red = red |> min 255 |> max 0
+        , green = green |> min 255 |> max 0
+        , blue = blue |> min 255 |> max 0
+        , alpha = alpha |> min 1.0 |> max 0.0
+        }
 
 
-fModBy : Float -> Int -> Float
-fModBy f n =
-    let
-        integer =
-            floor f
-    in
-    toFloat (modBy n integer) + f - toFloat integer
+fromRgba : Rgba -> RgbaRecord
+fromRgba (Rgba record) =
+    record
 
 
-convertRgbaToHsva : Rgba -> Hsva
-convertRgbaToHsva { red, green, blue, alpha } =
+hsva : HsvaRecord -> Hsva
+hsva { hue, saturation, value, alpha } =
+    Hsva
+        { hue = hue
+        , saturation = saturation |> min 1.0 |> max 0.0
+        , value = value |> min 1.0 |> max 0.0
+        , alpha = alpha |> min 1.0 |> max 0.0
+        }
+
+
+fromHsva : Hsva -> HsvaRecord
+fromHsva (Hsva record) =
+    record
+
+
+rgbaToHsva : Rgba -> Hsva
+rgbaToHsva (Rgba { red, green, blue, alpha }) =
     let
         r =
             toFloat red / 255
@@ -106,11 +108,11 @@ convertRgbaToHsva { red, green, blue, alpha } =
             else
                 c / cMax
     in
-    Hsva (round h) s cMax alpha
+    Hsva (HsvaRecord (round h) s cMax alpha)
 
 
-convertHsvaToRgba : Hsva -> Rgba
-convertHsvaToRgba { hue, saturation, value, alpha } =
+hsvaToRgba : Hsva -> Rgba
+hsvaToRgba (Hsva { hue, saturation, value, alpha }) =
     let
         h =
             modBy 360 hue
@@ -144,7 +146,31 @@ convertHsvaToRgba { hue, saturation, value, alpha } =
                 ( c, 0, x )
     in
     Rgba
-        (round ((r + m) * 255))
-        (round ((g + m) * 255))
-        (round ((b + m) * 255))
-        alpha
+        (RgbaRecord
+            (round ((r + m) * 255))
+            (round ((g + m) * 255))
+            (round ((b + m) * 255))
+            alpha
+        )
+
+
+rgbaToCss : Rgba -> String
+rgbaToCss (Rgba { red, green, blue, alpha }) =
+    "rgba("
+        ++ String.fromInt red
+        ++ ","
+        ++ String.fromInt green
+        ++ ","
+        ++ String.fromInt blue
+        ++ ","
+        ++ String.fromFloat alpha
+        ++ ")"
+
+
+fModBy : Float -> Int -> Float
+fModBy f n =
+    let
+        integer =
+            floor f
+    in
+    toFloat (modBy n integer) + f - toFloat integer

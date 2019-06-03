@@ -7,25 +7,19 @@ const app = Elm.Main.init({
     node: document.getElementById('app')
 });
 
-app.ports.revokeBlob.subscribe(revokeBlob);
-app.ports.runWorker.subscribe(color => createModPackage(color).catch(rethrowError));
-app.ports.saveBlob.subscribe(({ blobUrl, fileName }) => saveBlob(blobUrl, fileName));
+app.ports.startWorker.subscribe(color => createModPackage(color).catch(rethrowError));
 
-function revokeBlob(blobUrl: string) {
-    URL.revokeObjectURL(blobUrl);
-}
 
 async function createModPackage(color: IRgba) {
     const { createModPackage } = await import('./worker');
     const buffer = await createModPackage(color);
     const blob = new Blob([buffer]);
-    app.ports.getPackage.send({
-        color,
-        blobUrl: URL.createObjectURL(blob)
-    });
+    saveBlob(blob, 'goldvisibility.color.wotmod');
+    app.ports.finishedModPackage.send();
 }
 
-function saveBlob(blobUrl: string, fileName: string) {
+function saveBlob(blob: Blob, fileName: string) {
+    const blobUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     document.body.appendChild(a);
     a.href = blobUrl;
@@ -33,6 +27,7 @@ function saveBlob(blobUrl: string, fileName: string) {
     a.click();
     setTimeout(() => {
         document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
     });
 }
 
