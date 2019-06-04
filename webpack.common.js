@@ -14,8 +14,14 @@ const project = __dirname;
 const dist = path.resolve(project, 'dist');
 const wasm = path.resolve(project, 'src/worker/wasm');
 
-const createConfig = (inProd, inDev) => ({
+const createConfig = (inProdMode, inDevMode) => ({
     entry: './src/index.ts',
+    ...inDevMode({
+        mode: 'development'
+    }),
+    ...inProdMode({
+        mode: 'production'
+    }),
     output: {
         path: dist,
         filename: '[name].[hash].js',
@@ -36,10 +42,10 @@ const createConfig = (inProd, inDev) => ({
                         loader: 'elm-webpack-loader',
                         options: {
                             cwd: project,
-                            ...inDev({
+                            ...inDevMode({
                                 debug: true
                             }),
-                            ...inProd({
+                            ...inProdMode({
                                 optimize: true
                             })
                         }
@@ -74,7 +80,7 @@ const createConfig = (inProd, inDev) => ({
                                         './src/**/*.ts'
                                     ],
                                 }),
-                                ...inProd([
+                                ...inProdMode([
                                     cssnano({
                                         preset: 'default',
                                     }),
@@ -119,12 +125,12 @@ const createConfig = (inProd, inDev) => ({
     ]
 });
 
-// supply default for argv for Webstorm to be able to analyze the config
-module.exports = (env, argv = {p: true}) => createConfig(inProd(argv.p), inDev(argv.p));
 
-function inProd(isProd) {
+module.exports = (production = true) => createConfig(inProdMode(production), inDevMode(production));
+
+function inProdMode(production) {
     return arrayOrObject => {
-        if (isProd) {
+        if (production) {
             return arrayOrObject;
         } else {
             return Array.isArray(arrayOrObject) ? [] : {};
@@ -132,6 +138,6 @@ function inProd(isProd) {
     }
 }
 
-function inDev(isProd) {
-    return inProd(!isProd);
+function inDevMode(isProd) {
+    return inProdMode(!isProd);
 }
