@@ -6,4 +6,6 @@ import CssModules exposing (css)
 styles =
     css "./Picker/Styles.css"
         { checkerboard = "checkerboard"
+        , dragContainer = "drag-container"
+        , knob = "knob"
         }
