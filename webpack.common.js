@@ -110,7 +110,9 @@ const createConfig = (inProdMode, inDevMode) => ({
         contentBase: dist,
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        ...inProdMode([
+            new CleanWebpackPlugin()
+        ]),
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: 'src/index.html'
@@ -124,7 +126,6 @@ const createConfig = (inProdMode, inDevMode) => ({
         })
     ]
 });
-
 
 module.exports = (production = true) => createConfig(inProdMode(production), inDevMode(production));
 
