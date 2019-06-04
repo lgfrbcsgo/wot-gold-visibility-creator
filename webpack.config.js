@@ -119,7 +119,8 @@ const createConfig = (inProd, inDev) => ({
     ]
 });
 
-module.exports = (env, argv) => createConfig(inProd(argv.p), inDev(argv.p));
+// supply default for argv for Webstorm to be able to analyze the config
+module.exports = (env, argv = {p: true}) => createConfig(inProd(argv.p), inDev(argv.p));
 
 function inProd(isProd) {
     return arrayOrObject => {
