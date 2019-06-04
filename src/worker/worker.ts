@@ -1,16 +1,16 @@
 import {expose, transfer, proxy} from 'comlink';
-import {IWorkerInitializer} from "./interface";
-import {IRgba} from "../common";
+import {CreatorWorkerInitializer} from "./types";
+import {Rgba} from "../types";
 
-const setupWasmWorker: IWorkerInitializer = async config => {
-    const { Worker } = await import('./wasm/pkg');
-    class TransferringWorker extends Worker {
-        create(color: IRgba) {
+const setupWasmWorker: CreatorWorkerInitializer = async config => {
+    const { WasmCreatorWorker } = await import('./wasm/pkg');
+    class TransferringCreatorWorker extends WasmCreatorWorker {
+        create(color: Rgba) {
             const data = super.create(color);
             return transfer(data, [data.buffer]);
         }
     }
-    return proxy(new TransferringWorker(config));
+    return proxy(new TransferringCreatorWorker(config));
 };
 
 expose(setupWasmWorker);

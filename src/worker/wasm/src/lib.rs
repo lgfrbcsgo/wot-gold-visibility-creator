@@ -116,15 +116,15 @@ impl Into<Vec<TextureConfig>> for JsTextureConfigArray {
 
 
 #[wasm_bindgen]
-struct Worker {
+struct WasmCreatorWorker {
     texture_configs: Vec<TextureConfig>
 }
 
 #[wasm_bindgen]
-impl Worker {
+impl WasmCreatorWorker {
     #[wasm_bindgen(constructor)]
-    pub fn new(textures: JsTextureConfigArray) -> Worker {
-        Worker {
+    pub fn new(textures: JsTextureConfigArray) -> WasmCreatorWorker {
+        WasmCreatorWorker {
             texture_configs: textures.into()
         }
     }

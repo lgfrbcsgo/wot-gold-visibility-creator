@@ -1,5 +1,5 @@
 import {Elm} from './app/Main';
-import {IRgba} from './common';
+import {Rgba} from './types';
 
 import './styles.css';
 
@@ -9,8 +9,7 @@ const app = Elm.Main.init({
 
 app.ports.startWorker.subscribe(color => createModPackage(color).catch(rethrowError));
 
-
-async function createModPackage(color: IRgba) {
+async function createModPackage(color: Rgba) {
     const { createModPackage } = await import('./worker');
     const buffer = await createModPackage(color);
     const blob = new Blob([buffer]);

@@ -1,4 +1,4 @@
-import {IRgba} from "../common";
+import {Rgba} from "../types";
 
 interface PortToElm<T> {
     send(value: T) : void;
@@ -12,7 +12,7 @@ export namespace Elm {
     namespace Main {
         export interface App {
             ports: {
-                startWorker: PortFromElm<IRgba>,
+                startWorker: PortFromElm<Rgba>,
                 finishedModPackage: PortToElm<void>
             };
         }

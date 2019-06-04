@@ -1,32 +1,31 @@
 import {wrap, transfer} from 'comlink';
-import {IRgba} from '../common';
-
+import {Rgba} from '../types';
+import {TextureConfig, CreatorWorkerInitializer, CreatorWorker} from './types';
 import packageConfig from '../../res/worker/package.config.json';
-import {ITextureConfig, IWorkerInitializer} from "./interface";
 
-const initializeWorker = wrap<IWorkerInitializer>(
-    new Worker('./worker', {type: 'module'})
-);
+const worker = new Worker('./worker', {type: 'module'});
+const creatorWorker = initializeCreatorWorker(worker);
 
-const createWorkerConfig = cache(async () : Promise<ITextureConfig[]> => {
+export async function createModPackage(color: Rgba): Promise<Uint8Array> {
+    const worker = await creatorWorker;
+    return await worker.create(color);
+}
+
+async function initializeCreatorWorker(worker: Worker): Promise<CreatorWorker> {
+    const config = await loadPackageConfig();
+    return await wrap<CreatorWorkerInitializer>(worker)(config);
+}
+
+async function loadPackageConfig() : Promise<TextureConfig[]> {
     const textures = packageConfig.textures.map(async ({ src, packagePath }) => {
-        const textureConfig: ITextureConfig = {
+        const imageUrl = require('../../res/worker/' + src);
+        const textureConfig: TextureConfig = {
             packagePath,
-            imageData: await loadImageData(require('../../res/worker/' + src))
+            imageData: await loadImageData(imageUrl)
         };
         return transfer(textureConfig, [textureConfig.imageData.data.buffer]);
     });
     return await Promise.all(textures);
-});
-
-const createWorker = cache(async () => {
-    const config = await createWorkerConfig();
-    return await initializeWorker(config);
-});
-
-export async function createModPackage(color: IRgba): Promise<Uint8Array> {
-    const worker = await createWorker();
-    return await worker.create(color);
 }
 
 async function loadImageData(url: string): Promise<ImageData> {
@@ -60,17 +59,5 @@ async function loadImage(url: string): Promise<HTMLImageElement | ImageBitmap> {
         return await self.createImageBitmap(await loading);
     } else {
         return await loading;
-    }
-}
-
-function cache<T, V>(innerFunc: () => V) {
-    let result: V;
-    let didRun = false;
-    return () => {
-        if (!didRun) {
-            result = innerFunc();
-            didRun = true;
-        }
-        return result;
     }
 }
