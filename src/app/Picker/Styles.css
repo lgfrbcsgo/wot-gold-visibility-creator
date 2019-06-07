@@ -2,21 +2,21 @@
     width: 100%;
     height: 100%;
     background: #BFBFBF url('../../../res/assets/checkerboard.svg');
-    background-size: 16px 16px;
+    background-size: 1rem 1rem;
 }
 
 .drag-container {
     position: relative;
-    width: 500px;
-    height: 200px;
+    width: 25rem;
+    height: 10rem;
 }
 
 .knob {
     z-index: 1;
     position: absolute;
-    width: 10px;
-    height: 10px;
-    margin-left: -7px;
-    margin-top: -7px;
-    border: 2px solid white;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-left: -0.875rem;
+    margin-top: -0.875rem;
+    border: 0.25rem solid white;
 }
