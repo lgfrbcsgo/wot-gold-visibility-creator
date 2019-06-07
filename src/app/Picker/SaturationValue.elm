@@ -33,6 +33,7 @@ type alias DragContext =
 
 type Model
     = Dragging DragContext
+    | KnobClicked
     | Resting
 
 
@@ -46,52 +47,49 @@ init =
 
 
 type Msg
-    = DragStart DragContext
+    = KnobClick
+    | DragStart DragContext
     | Drag Position
     | DragEnd
 
 
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
 update msg color model =
-    case model of
-        Resting ->
-            updateResting msg color
-
-        Dragging dragContext ->
-            updateDragging msg color dragContext
-
-
-updateResting : Msg -> Hsva -> ( Hsva, Model )
-updateResting msg color =
     case msg of
+        KnobClick ->
+            ( color, KnobClicked )
+
         DragStart dragContext ->
             let
                 size =
                     dragContext.startSize
 
                 relPosition =
-                    dragContext.relStartPosition
+                    case model of
+                        KnobClicked ->
+                            colorToRelPosition dragContext.startSize color
+
+                        _ ->
+                            dragContext.relStartPosition
             in
-            ( relPositionToColor size relPosition color, Dragging dragContext )
+            ( relPositionToColor size relPosition color, Dragging { dragContext | relStartPosition = relPosition } )
 
-        _ ->
-            ( color, Resting )
-
-
-updateDragging : Msg -> Hsva -> DragContext -> ( Hsva, Model )
-updateDragging msg color dragContext =
-    case msg of
         Drag absPosition ->
-            let
-                size =
-                    dragContext.startSize
+            case model of
+                Dragging dragContext ->
+                    let
+                        size =
+                            dragContext.startSize
 
-                relPosition =
-                    absToRelPosition absPosition dragContext
-            in
-            ( relPositionToColor size relPosition color, Dragging dragContext )
+                        relPosition =
+                            absToRelPosition absPosition dragContext
+                    in
+                    ( relPositionToColor size relPosition color, Dragging dragContext )
 
-        _ ->
+                _ ->
+                    ( color, model )
+
+        DragEnd ->
             ( color, Resting )
 
 
@@ -137,6 +135,21 @@ relPositionToColor size relPosition color =
     HsvaRecord hue saturation value alpha |> hsva
 
 
+colorToRelPosition : Size -> Hsva -> Position
+colorToRelPosition size color =
+    let
+        { saturation, value } =
+            fromHsva color
+
+        x =
+            toFloat size.width * saturation |> floor
+
+        y =
+            toFloat size.height * (1 - value) |> floor
+    in
+    Position x y
+
+
 
 ---- SUBSCRIPTIONS ----
 
@@ -149,6 +162,9 @@ subscriptions model =
                 [ Browser.Events.onMouseMove <| Decode.map Drag decodeAbsolutePosition
                 , Browser.Events.onMouseUp <| Decode.succeed DragEnd
                 ]
+
+        KnobClicked ->
+            Browser.Events.onMouseUp <| Decode.succeed DragEnd
 
         Resting ->
             Sub.none
@@ -170,6 +186,17 @@ view color model =
         gradientColor =
             HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
+        backgroundListeners =
+            case model of
+                Dragging _ ->
+                    []
+
+                _ ->
+                    [ Html.Events.on "mousedown" <|
+                        Decode.map DragStart <|
+                            Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
+                    ]
+
         knobTop =
             String.fromFloat ((1 - value) * 100) ++ "%"
 
@@ -179,24 +206,28 @@ view color model =
         knobBackground =
             HsvaRecord hue saturation value 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
-        listeners =
+        knobListeners =
             case model of
-                Resting ->
-                    [ Html.Events.on "mousedown" <|
-                        Decode.map DragStart <|
-                            Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
-                    ]
-
                 Dragging _ ->
                     []
+
+                _ ->
+                    [ Html.Events.on "mousedown" <| Decode.succeed KnobClick ]
     in
-    Html.div (listeners ++ [ styles.class .checkerboard, styles.class .dragContainer ])
+    Html.div
+        (backgroundListeners
+            ++ [ styles.class .checkerboard
+               , styles.class .dragContainer
+               ]
+        )
         [ Html.div
-            [ styles.class .knob
-            , Html.Attributes.style "top" knobTop
-            , Html.Attributes.style "left" knobLeft
-            , Html.Attributes.style "backgroundColor" knobBackground
-            ]
+            (knobListeners
+                ++ [ styles.class .knob
+                   , Html.Attributes.style "top" knobTop
+                   , Html.Attributes.style "left" knobLeft
+                   , Html.Attributes.style "backgroundColor" knobBackground
+                   ]
+            )
             []
         , svg [ height "100%", width "100%", opacity svgOpacity ]
             [ defs []
