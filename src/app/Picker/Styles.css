@@ -3,13 +3,12 @@
     height: 100%;
     background: #BFBFBF url('../../../res/assets/checkerboard.svg');
     background-size: 16px 16px;
-    position: relative;
 }
 
 .drag-container {
+    position: relative;
     width: 500px;
     height: 200px;
-    padding: 5px 5px;
 }
 
 .knob {
@@ -17,7 +16,7 @@
     position: absolute;
     width: 10px;
     height: 10px;
-    margin-left: -5px;
-    margin-top: -5px;
-    background-color: black;
+    margin-left: -7px;
+    margin-top: -7px;
+    border: 2px solid white;
 }

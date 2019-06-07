@@ -1,27 +1,27 @@
 module Picker exposing (Model, Msg, init, subscriptions, update, view)
 
-import Picker.SaturationLightness as SL
+import Picker.SaturationValue as SaturationValue
 
 
 type alias Model =
-    SL.Model
+    SaturationValue.Model
 
 
 init =
-    SL.init
+    SaturationValue.init
 
 
 type alias Msg =
-    SL.Msg
+    SaturationValue.Msg
 
 
 update =
-    SL.update
+    SaturationValue.update
 
 
 subscriptions =
-    SL.subscriptions
+    SaturationValue.subscriptions
 
 
 view =
-    SL.view
+    SaturationValue.view

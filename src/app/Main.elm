@@ -5,15 +5,15 @@ import Color exposing (..)
 import CssModules exposing (css)
 import Html exposing (..)
 import Html.Events exposing (..)
-import Json.Decode as D
-import Json.Encode as E
-import Picker as P
+import Json.Decode as Decode
+import Json.Encode as Encode
+import Picker as Picker
 
 
-port startWorker : E.Value -> Cmd msg
+port startWorker : Encode.Value -> Cmd msg
 
 
-port finishedModPackage : (D.Value -> msg) -> Sub msg
+port finishedModPackage : (Decode.Value -> msg) -> Sub msg
 
 
 
@@ -28,14 +28,14 @@ type alias Package =
 
 type alias Model =
     { color : Hsva
-    , picker : P.Model
+    , picker : Picker.Model
     , running : Bool
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model (hsva (HsvaRecord 360 1.0 1.0 0.5)) P.init False
+    ( Model (hsva (HsvaRecord 360 1.0 1.0 0.5)) Picker.init False
     , Cmd.none
     )
 
@@ -47,7 +47,7 @@ init _ =
 type Msg
     = CreateModPackage
     | FinishedModPackage
-    | Picker P.Msg
+    | Picker Picker.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -70,12 +70,12 @@ update msg model =
 
         Picker pickerMsg ->
             let
-                ( picker, color ) =
-                    P.update model.color pickerMsg model.picker
+                ( updatedColor, updatedPickerModel ) =
+                    Picker.update pickerMsg model.color model.picker
             in
             ( { model
-                | color = color
-                , picker = picker
+                | color = updatedColor
+                , picker = updatedPickerModel
               }
             , Cmd.none
             )
@@ -86,17 +86,17 @@ createModPackage =
     hsvaToRgba >> encodeRgba >> startWorker
 
 
-encodeRgba : Rgba -> E.Value
+encodeRgba : Rgba -> Encode.Value
 encodeRgba color =
     let
         { red, green, blue, alpha } =
             fromRgba color
     in
-    E.object
-        [ ( "red", E.int red )
-        , ( "green", E.int green )
-        , ( "blue", E.int blue )
-        , ( "alpha", E.float alpha )
+    Encode.object
+        [ ( "red", Encode.int red )
+        , ( "green", Encode.int green )
+        , ( "blue", Encode.int blue )
+        , ( "alpha", Encode.float alpha )
         ]
 
 
@@ -105,9 +105,9 @@ encodeRgba color =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions model =
     Sub.batch
-        [ P.subscriptions |> Sub.map Picker
+        [ Picker.subscriptions model.picker |> Sub.map Picker
         , always FinishedModPackage |> finishedModPackage
         ]
 
@@ -131,7 +131,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ button [ styles.class .btn, styles.class .btnBlue, onClick CreateModPackage ] [ text "Run" ]
-        , P.view model.color model.picker |> map Picker
+        , Picker.view model.color model.picker |> map Picker
         ]
 
 
