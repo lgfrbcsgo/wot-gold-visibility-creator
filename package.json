@@ -15,6 +15,7 @@
     "clean-webpack-plugin": "^2.0.2",
     "css-loader": "^2.1.1",
     "cssnano": "^4.1.10",
+    "elm-css-modules-loader": "^3.0.4",
     "elm-hot-webpack-loader": "^1.0.2",
     "elm-webpack-loader": "lgfrbcsgo/elm-webpack-loader#remove-elm",
     "file-loader": "^3.0.1",
@@ -31,7 +32,6 @@
     "worker-plugin": "^3.1.0"
   },
   "dependencies": {
-    "comlink": "^4.0.1",
-    "elm-css-modules-loader": "^3.0.4"
+    "comlink": "^4.0.1"
   }
 }
