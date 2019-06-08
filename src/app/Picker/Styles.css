@@ -5,20 +5,8 @@
     background-size: 1rem 1rem;
 }
 
-.drag-container {
-    touch-action: none;
-    position: relative;
-    width: 25rem;
-    height: 10rem;
-}
-
 .thumb {
-    z-index: 1;
-    position: absolute;
     width: 1.5rem;
     height: 1.5rem;
-    margin-left: -0.875rem;
-    margin-top: -0.875rem;
     border: 0.25rem solid white;
-    cursor: pointer;
 }

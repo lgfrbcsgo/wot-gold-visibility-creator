@@ -117,6 +117,7 @@ styles =
     css "./Main.css"
         { btn = "btn"
         , btnBlue = "btn-blue"
+        , picker = "picker"
         }
 
 
@@ -128,7 +129,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ button [ styles.class .btn, styles.class .btnBlue, onClick CreateModPackage ] [ text "Run" ]
-        , Picker.view model.color model.picker |> map Picker
+        , div [ styles.class .picker ] [ Picker.view model.color model.picker |> map Picker ]
         ]
 
 

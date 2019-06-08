@@ -1,0 +1,13 @@
+.drag-container {
+    touch-action: none;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.thumb {
+    z-index: 1;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
