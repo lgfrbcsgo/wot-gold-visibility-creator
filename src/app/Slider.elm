@@ -146,8 +146,8 @@ clamp min max value =
 ---- VIEW ----
 
 
-view : Html msg -> Html msg -> (Msg -> msg) -> Position -> Model -> Html msg
-view viewThumb viewBody toMsg relativePosition model =
+view : Html Msg -> Html Msg -> Position -> Model -> Html Msg
+view viewThumb viewBody relativePosition model =
     let
         { x, y } =
             clampPosition relativePosition
@@ -166,7 +166,7 @@ view viewThumb viewBody toMsg relativePosition model =
                 _ ->
                     [ Html.Events.on "pointerdown" <|
                         failIfNotPrimary <|
-                            Decode.succeed (toMsg ThumbClick)
+                            Decode.succeed ThumbClick
                     ]
 
         backgroundListeners =
@@ -177,9 +177,8 @@ view viewThumb viewBody toMsg relativePosition model =
                 _ ->
                     [ Html.Events.on "pointerdown" <|
                         failIfNotPrimary <|
-                            Decode.map toMsg <|
-                                Decode.map DragStart <|
-                                    Decode.map3 DragContext decodeSize decodeOffsetPosition decodePagePosition
+                            Decode.map DragStart <|
+                                Decode.map3 DragContext decodeSize decodeOffsetPosition decodePagePosition
                     ]
 
         windowListeners =
@@ -187,17 +186,16 @@ view viewThumb viewBody toMsg relativePosition model =
                 Dragging _ ->
                     [ Html.Events.on "pointermove" <|
                         failIfNotPrimary <|
-                            Decode.map toMsg <|
-                                Decode.map Drag decodePagePosition
+                            Decode.map Drag decodePagePosition
                     , Html.Events.on "pointerup" <|
                         failIfNotPrimary <|
-                            Decode.succeed (toMsg DragEnd)
+                            Decode.succeed DragEnd
                     ]
 
                 ThumbClicked ->
                     [ Html.Events.on "pointerup" <|
                         failIfNotPrimary <|
-                            Decode.succeed (toMsg DragEnd)
+                            Decode.succeed DragEnd
                     ]
 
                 Resting ->
@@ -217,9 +215,9 @@ view viewThumb viewBody toMsg relativePosition model =
                        , Html.Attributes.style "left" thumbLeft
                        ]
                 )
-                [ viewThumb
+                [ Html.map (always DragEnd) viewThumb
                 ]
-            , viewBody
+            , Html.map (always DragEnd) viewBody
             ]
         ]
 

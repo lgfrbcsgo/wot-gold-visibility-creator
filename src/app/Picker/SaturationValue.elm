@@ -98,4 +98,4 @@ view color model =
                     ]
                 ]
     in
-    Slider.view viewThumb viewBackground identity relativePosition model
+    Slider.view viewThumb viewBackground relativePosition model
