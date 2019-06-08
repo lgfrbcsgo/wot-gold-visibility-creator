@@ -28,6 +28,7 @@ type alias DragContext =
     { startSize : Size
     , relStartPosition : Position
     , absStartPosition : Position
+    , touchIdentifier : Maybe Int
     }
 
 
@@ -47,7 +48,7 @@ init =
 
 
 type Msg
-    = ThumbClick
+    = ThumbClick (Maybe Int)
     | DragStart DragContext
     | Drag Position
     | DragEnd
@@ -56,7 +57,7 @@ type Msg
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
 update msg color model =
     case msg of
-        ThumbClick ->
+        ThumbClick _ ->
             ( color, ThumbClicked )
 
         DragStart dragContext ->
@@ -194,7 +195,7 @@ view color model =
                 _ ->
                     [ Html.Events.on "mousedown" <|
                         Decode.map DragStart <|
-                            Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
+                            Decode.map4 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition (Decode.succeed Nothing)
                     ]
 
         thumbTop =
@@ -212,7 +213,7 @@ view color model =
                     []
 
                 _ ->
-                    [ Html.Events.on "mousedown" <| Decode.succeed ThumbClick ]
+                    [ Html.Events.on "mousedown" <| Decode.map ThumbClick (Decode.succeed Nothing) ]
     in
     Html.div
         (backgroundListeners
