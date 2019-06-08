@@ -1,7 +1,6 @@
-module Picker.SaturationValue exposing (Model, Msg, init, subscriptions, update, view)
+module Picker.SaturationValue exposing (Model, Msg, init, update, view)
 
 import Basics
-import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
 import Html.Attributes
@@ -17,11 +16,11 @@ import Svg.Attributes exposing (..)
 
 
 type alias Size =
-    { width : Int, height : Int }
+    { width : Float, height : Float }
 
 
 type alias Position =
-    { x : Int, y : Int }
+    { x : Float, y : Float }
 
 
 type alias DragContext =
@@ -127,10 +126,10 @@ relPositionToColor size relPosition color =
             fromHsva color
 
         saturation =
-            toFloat x / toFloat width
+            x / width
 
         value =
-            1 - toFloat y / toFloat height
+            1 - y / height
     in
     HsvaRecord hue saturation value alpha |> hsva
 
@@ -142,32 +141,12 @@ colorToRelPosition size color =
             fromHsva color
 
         x =
-            toFloat size.width * saturation |> floor
+            size.width * saturation
 
         y =
-            toFloat size.height * (1 - value) |> floor
+            size.height * (1 - value)
     in
     Position x y
-
-
-
----- SUBSCRIPTIONS ----
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    case model of
-        Dragging _ ->
-            Sub.batch
-                [ Browser.Events.onMouseMove <| Decode.map Drag decodeAbsolutePosition
-                , Browser.Events.onMouseUp <| Decode.succeed DragEnd
-                ]
-
-        ThumbClicked ->
-            Browser.Events.onMouseUp <| Decode.succeed DragEnd
-
-        Resting ->
-            Sub.none
 
 
 
@@ -192,7 +171,7 @@ view color model =
                     []
 
                 _ ->
-                    [ Html.Events.on "mousedown" <|
+                    [ Html.Events.on "pointerdown" <|
                         Decode.map DragStart <|
                             Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
                     ]
@@ -212,42 +191,58 @@ view color model =
                     []
 
                 _ ->
-                    [ Html.Events.on "mousedown" <| Decode.succeed ThumbClick ]
+                    [ Html.Events.on "pointerdown" <| Decode.succeed ThumbClick ]
+
+        windowListeners =
+            case model of
+                Dragging _ ->
+                    [ Html.Events.on "pointermove" <| Decode.map Drag decodeAbsolutePosition
+                    , Html.Events.on "pointerup" <| Decode.succeed DragEnd
+                    ]
+
+                ThumbClicked ->
+                    [ Html.Events.on "pointerup" <| Decode.succeed DragEnd ]
+
+                Resting ->
+                    []
     in
-    Html.div
-        (backgroundListeners
-            ++ [ styles.class .checkerboard
-               , styles.class .dragContainer
-               ]
-        )
+    Html.node "window-event-proxy"
+        windowListeners
         [ Html.div
-            (thumbListeners
-                ++ [ styles.class .thumb
-                   , Html.Attributes.style "top" thumbTop
-                   , Html.Attributes.style "left" thumbLeft
-                   , Html.Attributes.style "backgroundColor" thumbBackground
+            (backgroundListeners
+                ++ [ styles.class .checkerboard
+                   , styles.class .dragContainer
                    ]
             )
-            []
-        , svg [ height "100%", width "100%", opacity svgOpacity ]
-            [ defs []
-                [ linearGradient [ id "gradient-to-black", x1 "0%", x2 "0%", y1 "0%", y2 "100%" ]
-                    [ stop [ offset "0%", stopColor "white" ] []
-                    , stop [ offset "100%", stopColor "black" ] []
+            [ Html.div
+                (thumbListeners
+                    ++ [ styles.class .thumb
+                       , Html.Attributes.style "top" thumbTop
+                       , Html.Attributes.style "left" thumbLeft
+                       , Html.Attributes.style "backgroundColor" thumbBackground
+                       ]
+                )
+                []
+            , svg [ height "100%", width "100%", opacity svgOpacity ]
+                [ defs []
+                    [ linearGradient [ id "gradient-to-black", x1 "0%", x2 "0%", y1 "0%", y2 "100%" ]
+                        [ stop [ offset "0%", stopColor "white" ] []
+                        , stop [ offset "100%", stopColor "black" ] []
+                        ]
+                    , linearGradient [ id "gradient-to-color", x1 "0%", x2 "100%", y1 "0%", y2 "0%" ]
+                        [ stop [ offset "0%", stopColor "white" ] []
+                        , stop [ offset "100%", stopColor gradientColor ] []
+                        ]
+                    , rect [ id "gradient-to-black-rect", width "100%", height "100%", fill "url(#gradient-to-black)" ] []
+                    , rect [ id "gradient-to-color-rect", width "100%", height "100%", fill "url(#gradient-to-color)" ] []
+                    , Svg.filter [ id "gradient-multiply", x "0%", y "0%", width "100%", height "100%", colorInterpolationFilters "sRGB" ]
+                        [ feImage [ width "100%", height "100%", result "black", xlinkHref "#gradient-to-black-rect" ] []
+                        , feImage [ width "100%", height "100%", result "color", xlinkHref "#gradient-to-color-rect" ] []
+                        , feBlend [ in_ "black", in2 "color", mode "multiply" ] []
+                        ]
                     ]
-                , linearGradient [ id "gradient-to-color", x1 "0%", x2 "100%", y1 "0%", y2 "0%" ]
-                    [ stop [ offset "0%", stopColor "white" ] []
-                    , stop [ offset "100%", stopColor gradientColor ] []
-                    ]
-                , rect [ id "gradient-to-black-rect", width "100%", height "100%", fill "url(#gradient-to-black)" ] []
-                , rect [ id "gradient-to-color-rect", width "100%", height "100%", fill "url(#gradient-to-color)" ] []
-                , Svg.filter [ id "gradient-multiply", x "0%", y "0%", width "100%", height "100%", colorInterpolationFilters "sRGB" ]
-                    [ feImage [ width "100%", height "100%", result "black", xlinkHref "#gradient-to-black-rect" ] []
-                    , feImage [ width "100%", height "100%", result "color", xlinkHref "#gradient-to-color-rect" ] []
-                    , feBlend [ in_ "black", in2 "color", mode "multiply" ] []
-                    ]
+                , rect [ Svg.Attributes.filter "url(#gradient-multiply)", x "0", y "0", width "100%", height "100%" ] []
                 ]
-            , rect [ Svg.Attributes.filter "url(#gradient-multiply)", x "0", y "0", width "100%", height "100%" ] []
             ]
         ]
 
@@ -255,19 +250,19 @@ view color model =
 decodeAbsolutePosition : Decode.Decoder Position
 decodeAbsolutePosition =
     Decode.map2 Position
-        (Decode.field "pageX" Decode.int)
-        (Decode.field "pageY" Decode.int)
+        (Decode.field "pageX" Decode.float)
+        (Decode.field "pageY" Decode.float)
 
 
 decodeRelativePosition : Decode.Decoder Position
 decodeRelativePosition =
     Decode.map2 Position
-        (Decode.field "offsetX" Decode.int)
-        (Decode.field "offsetY" Decode.int)
+        (Decode.field "offsetX" Decode.float)
+        (Decode.field "offsetY" Decode.float)
 
 
 decodeSize : Decode.Decoder Size
 decodeSize =
     Decode.map2 Size
-        (Decode.int |> Decode.at [ "currentTarget", "offsetWidth" ])
-        (Decode.int |> Decode.at [ "currentTarget", "offsetHeight" ])
+        (Decode.float |> Decode.at [ "currentTarget", "offsetWidth" ])
+        (Decode.float |> Decode.at [ "currentTarget", "offsetHeight" ])

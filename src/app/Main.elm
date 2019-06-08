@@ -105,11 +105,8 @@ encodeRgba color =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ Picker.subscriptions model.picker |> Sub.map Picker
-        , always FinishedModPackage |> finishedModPackage
-        ]
+subscriptions _ =
+    always FinishedModPackage |> finishedModPackage
 
 
 

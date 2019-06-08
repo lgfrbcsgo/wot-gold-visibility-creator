@@ -6,6 +6,7 @@
 }
 
 .drag-container {
+    touch-action: none;
     position: relative;
     width: 25rem;
     height: 10rem;

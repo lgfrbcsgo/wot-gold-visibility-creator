@@ -1,4 +1,4 @@
-module Picker exposing (Model, Msg, init, subscriptions, update, view)
+module Picker exposing (Model, Msg, init, update, view)
 
 import Picker.SaturationValue as SaturationValue
 
@@ -17,10 +17,6 @@ type alias Msg =
 
 update =
     SaturationValue.update
-
-
-subscriptions =
-    SaturationValue.subscriptions
 
 
 view =
