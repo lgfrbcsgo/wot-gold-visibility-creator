@@ -165,18 +165,6 @@ view color model =
         gradientColor =
             HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
-        backgroundListeners =
-            case model of
-                Dragging _ ->
-                    []
-
-                _ ->
-                    [ Html.Events.on "pointerdown" <|
-                        failIfNotPrimary <|
-                            Decode.map DragStart <|
-                                Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
-                    ]
-
         thumbTop =
             String.fromFloat ((1 - value) * 100) ++ "%"
 
@@ -195,6 +183,18 @@ view color model =
                     [ Html.Events.on "pointerdown" <|
                         failIfNotPrimary <|
                             Decode.succeed ThumbClick
+                    ]
+
+        backgroundListeners =
+            case model of
+                Dragging _ ->
+                    []
+
+                _ ->
+                    [ Html.Events.on "pointerdown" <|
+                        failIfNotPrimary <|
+                            Decode.map DragStart <|
+                                Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
                     ]
 
         windowListeners =
