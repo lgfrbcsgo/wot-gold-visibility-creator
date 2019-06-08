@@ -54,6 +54,7 @@ type Msg
     | DragStart DragContext
     | Drag Position
     | DragEnd
+    | NoOp
 
 
 update : Msg -> Position -> Model -> ( Position, Model )
@@ -94,6 +95,9 @@ update msg relativePosition model =
 
         DragEnd ->
             ( relativePosition, Resting )
+
+        NoOp ->
+            ( relativePosition, model )
 
 
 pageToOffsetPosition : Position -> DragContext -> Position
@@ -161,7 +165,10 @@ view viewThumb viewBody relativePosition model =
         thumbListeners =
             case model of
                 Dragging _ ->
-                    []
+                    [ Html.Events.preventDefaultOn "dragstart" <|
+                        Decode.map (\msg -> ( msg, True )) <|
+                            Decode.succeed NoOp
+                    ]
 
                 _ ->
                     [ Html.Events.on "pointerdown" <|
