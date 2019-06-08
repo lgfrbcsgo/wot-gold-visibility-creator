@@ -11,7 +11,7 @@
     height: 10rem;
 }
 
-.knob {
+.thumb {
     z-index: 1;
     position: absolute;
     width: 1.5rem;

@@ -33,7 +33,7 @@ type alias DragContext =
 
 type Model
     = Dragging DragContext
-    | KnobClicked
+    | ThumbClicked
     | Resting
 
 
@@ -47,7 +47,7 @@ init =
 
 
 type Msg
-    = KnobClick
+    = ThumbClick
     | DragStart DragContext
     | Drag Position
     | DragEnd
@@ -56,8 +56,8 @@ type Msg
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
 update msg color model =
     case msg of
-        KnobClick ->
-            ( color, KnobClicked )
+        ThumbClick ->
+            ( color, ThumbClicked )
 
         DragStart dragContext ->
             let
@@ -66,7 +66,7 @@ update msg color model =
 
                 relPosition =
                     case model of
-                        KnobClicked ->
+                        ThumbClicked ->
                             colorToRelPosition dragContext.startSize color
 
                         _ ->
@@ -163,7 +163,7 @@ subscriptions model =
                 , Browser.Events.onMouseUp <| Decode.succeed DragEnd
                 ]
 
-        KnobClicked ->
+        ThumbClicked ->
             Browser.Events.onMouseUp <| Decode.succeed DragEnd
 
         Resting ->
@@ -197,22 +197,22 @@ view color model =
                             Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
                     ]
 
-        knobTop =
+        thumbTop =
             String.fromFloat ((1 - value) * 100) ++ "%"
 
-        knobLeft =
+        thumbLeft =
             String.fromFloat (saturation * 100) ++ "%"
 
-        knobBackground =
+        thumbBackground =
             HsvaRecord hue saturation value 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
-        knobListeners =
+        thumbListeners =
             case model of
                 Dragging _ ->
                     []
 
                 _ ->
-                    [ Html.Events.on "mousedown" <| Decode.succeed KnobClick ]
+                    [ Html.Events.on "mousedown" <| Decode.succeed ThumbClick ]
     in
     Html.div
         (backgroundListeners
@@ -221,11 +221,11 @@ view color model =
                ]
         )
         [ Html.div
-            (knobListeners
-                ++ [ styles.class .knob
-                   , Html.Attributes.style "top" knobTop
-                   , Html.Attributes.style "left" knobLeft
-                   , Html.Attributes.style "backgroundColor" knobBackground
+            (thumbListeners
+                ++ [ styles.class .thumb
+                   , Html.Attributes.style "top" thumbTop
+                   , Html.Attributes.style "left" thumbLeft
+                   , Html.Attributes.style "backgroundColor" thumbBackground
                    ]
             )
             []

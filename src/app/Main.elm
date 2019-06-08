@@ -35,7 +35,7 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model (hsva (HsvaRecord 360 1.0 1.0 0.5)) Picker.init False
+    ( Model (hsva (HsvaRecord 360 1 1 1)) Picker.init False
     , Cmd.none
     )
 

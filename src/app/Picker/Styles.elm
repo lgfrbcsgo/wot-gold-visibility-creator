@@ -7,5 +7,5 @@ styles =
     css "./Picker/Styles.css"
         { checkerboard = "checkerboard"
         , dragContainer = "drag-container"
-        , knob = "knob"
+        , thumb = "thumb"
         }
