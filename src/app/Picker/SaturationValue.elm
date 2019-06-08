@@ -172,8 +172,9 @@ view color model =
 
                 _ ->
                     [ Html.Events.on "pointerdown" <|
-                        Decode.map DragStart <|
-                            Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
+                        succeedOnPrimary <|
+                            Decode.map DragStart <|
+                                Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
                     ]
 
         thumbTop =
@@ -191,17 +192,27 @@ view color model =
                     []
 
                 _ ->
-                    [ Html.Events.on "pointerdown" <| Decode.succeed ThumbClick ]
+                    [ Html.Events.on "pointerdown" <|
+                        succeedOnPrimary <|
+                            Decode.succeed ThumbClick
+                    ]
 
         windowListeners =
             case model of
                 Dragging _ ->
-                    [ Html.Events.on "pointermove" <| Decode.map Drag decodeAbsolutePosition
-                    , Html.Events.on "pointerup" <| Decode.succeed DragEnd
+                    [ Html.Events.on "pointermove" <|
+                        succeedOnPrimary <|
+                            Decode.map Drag decodeAbsolutePosition
+                    , Html.Events.on "pointerup" <|
+                        succeedOnPrimary <|
+                            Decode.succeed DragEnd
                     ]
 
                 ThumbClicked ->
-                    [ Html.Events.on "pointerup" <| Decode.succeed DragEnd ]
+                    [ Html.Events.on "pointerup" <|
+                        succeedOnPrimary <|
+                            Decode.succeed DragEnd
+                    ]
 
                 Resting ->
                     []
@@ -245,6 +256,24 @@ view color model =
                 ]
             ]
         ]
+
+
+succeedOnPrimary : Decode.Decoder a -> Decode.Decoder a
+succeedOnPrimary decoder =
+    decodeIsPrimary
+        |> Decode.andThen
+            (\isPrimary ->
+                if isPrimary then
+                    decoder
+
+                else
+                    Decode.fail "is not primary pointer"
+            )
+
+
+decodeIsPrimary : Decode.Decoder Bool
+decodeIsPrimary =
+    Decode.field "isPrimary" Decode.bool
 
 
 decodeAbsolutePosition : Decode.Decoder Position
