@@ -4,7 +4,8 @@ import {Rgba} from './types';
 import './custom-elements/window-event-proxy';
 import './styles.css';
 
-if (!self.PointerEvent || !self.WebAssembly || !self.customElements) {
+// Safari does not support PointerEvents yet
+if (!self.PointerEvent || !self.WebAssembly) {
     throw new Error("Browser not supported");
 }
 
