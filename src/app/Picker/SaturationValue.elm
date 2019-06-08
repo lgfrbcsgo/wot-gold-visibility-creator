@@ -172,7 +172,7 @@ view color model =
 
                 _ ->
                     [ Html.Events.on "pointerdown" <|
-                        succeedOnPrimary <|
+                        failIfNotPrimary <|
                             Decode.map DragStart <|
                                 Decode.map3 DragContext decodeSize decodeRelativePosition decodeAbsolutePosition
                     ]
@@ -193,7 +193,7 @@ view color model =
 
                 _ ->
                     [ Html.Events.on "pointerdown" <|
-                        succeedOnPrimary <|
+                        failIfNotPrimary <|
                             Decode.succeed ThumbClick
                     ]
 
@@ -201,16 +201,16 @@ view color model =
             case model of
                 Dragging _ ->
                     [ Html.Events.on "pointermove" <|
-                        succeedOnPrimary <|
+                        failIfNotPrimary <|
                             Decode.map Drag decodeAbsolutePosition
                     , Html.Events.on "pointerup" <|
-                        succeedOnPrimary <|
+                        failIfNotPrimary <|
                             Decode.succeed DragEnd
                     ]
 
                 ThumbClicked ->
                     [ Html.Events.on "pointerup" <|
-                        succeedOnPrimary <|
+                        failIfNotPrimary <|
                             Decode.succeed DragEnd
                     ]
 
@@ -258,22 +258,20 @@ view color model =
         ]
 
 
-succeedOnPrimary : Decode.Decoder a -> Decode.Decoder a
-succeedOnPrimary decoder =
-    decodeIsPrimary
-        |> Decode.andThen
-            (\isPrimary ->
-                if isPrimary then
-                    decoder
-
-                else
-                    Decode.fail "is not primary pointer"
-            )
-
-
-decodeIsPrimary : Decode.Decoder Bool
-decodeIsPrimary =
+failIfNotPrimary : Decode.Decoder a -> Decode.Decoder a
+failIfNotPrimary decoder =
     Decode.field "isPrimary" Decode.bool
+        |> Decode.andThen (failIfNotPrimaryHelper decoder)
+
+
+failIfNotPrimaryHelper : Decode.Decoder a -> Bool -> Decode.Decoder a
+failIfNotPrimaryHelper decoder bool =
+    case bool of
+        True ->
+            decoder
+
+        False ->
+            Decode.fail "is not primary pointer"
 
 
 decodeAbsolutePosition : Decode.Decoder Position
