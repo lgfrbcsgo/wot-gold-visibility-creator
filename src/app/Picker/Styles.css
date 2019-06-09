@@ -10,3 +10,9 @@
     height: 1.5rem;
     border: 0.25rem solid white;
 }
+
+.hue-gradient {
+    width: 100%;
+    height: 1rem;
+    background: linear-gradient(to right, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%, 50%), hsl(300, 100%, 50%), hsl(360, 100%, 50%))
+}

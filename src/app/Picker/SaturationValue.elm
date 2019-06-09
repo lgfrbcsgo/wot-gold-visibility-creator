@@ -38,7 +38,7 @@ update msg color model =
             fromHsva color
 
         relativePosition =
-            Slider.Position saturation (1 - value)
+            saturationValueToRelativePosition saturation value
 
         ( updatedRelativePosition, updatedModel ) =
             Slider.update msg relativePosition model
@@ -47,6 +47,11 @@ update msg color model =
             HsvaRecord hue updatedRelativePosition.x (1 - updatedRelativePosition.y) alpha |> hsva
     in
     ( updatedColor, updatedModel )
+
+
+saturationValueToRelativePosition : Float -> Float -> Slider.Position
+saturationValueToRelativePosition saturation value =
+    Slider.Position saturation (1 - value)
 
 
 
@@ -60,7 +65,7 @@ view color model =
             fromHsva color
 
         relativePosition =
-            Slider.Position saturation (1 - value)
+            saturationValueToRelativePosition saturation value
 
         svgOpacity =
             alpha |> String.fromFloat
