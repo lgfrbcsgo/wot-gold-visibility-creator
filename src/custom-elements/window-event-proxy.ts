@@ -14,8 +14,12 @@ interface Listener {
     options?: any;
 }
 
-// custom element to use the virtual DOM of Elm to apply event listeners on the window object
-class WindowEventProxy extends HTMLElement {
+/**
+ * Custom element which applies event handlers to the window when calling {@link addEventListener} on the element.
+ * This is useful in Elm for applying custom event listeners on the window without ports.
+ * That way we can leverage Elm's virtual DOM to handle the listeners for us.
+ */
+export class WindowEventProxy extends HTMLElement {
     private connected = false;
 
     private listeners: Listener[] = [];
@@ -56,5 +60,3 @@ class WindowEventProxy extends HTMLElement {
         }
     }
 }
-
-customElements.define('window-event-proxy', WindowEventProxy);

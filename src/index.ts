@@ -1,10 +1,10 @@
 import {Elm} from './app/Main';
 import {Rgba} from './types';
 
-import './custom-elements/window-event-proxy';
+import './custom-elements';
 import './styles.css';
 
-// Safari does not support PointerEvents yet
+// Fail fast instead of making the app unusable
 if (!self.PointerEvent || !self.WebAssembly) {
     throw new Error("Browser not supported");
 }
@@ -40,9 +40,9 @@ function saveBlob(blob: Blob, fileName: string) {
     });
 }
 
+// Throws the error inside a setTimout to trigger the global error hook from the context of a Promise
 export function rethrowError(e: Error) {
     setTimeout(() => {
-        // throw error in new event loop cycle to escape promise and trigger global error hook
         throw e;
     });
     return Promise.reject(e);
