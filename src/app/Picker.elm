@@ -2,38 +2,35 @@ module Picker exposing (Model, Msg, init, update, view)
 
 import Color exposing (..)
 import Html exposing (Html, div)
+import Picker.Alpha as Alpha
 import Picker.Hue as Hue
 import Picker.SaturationValue as SaturationValue
 
 
 type alias Model =
-    { saturationValue : SaturationValue.Model
-    , hue : Hue.Model
+    { hue : Hue.Model
+    , saturationValue : SaturationValue.Model
+    , alpha : Alpha.Model
     }
 
 
 init : Model
 init =
-    { saturationValue = SaturationValue.init
-    , hue = Hue.init
+    { hue = Hue.init
+    , saturationValue = SaturationValue.init
+    , alpha = Alpha.init
     }
 
 
 type Msg
-    = SaturationValue SaturationValue.Msg
-    | Hue Hue.Msg
+    = Hue Hue.Msg
+    | SaturationValue SaturationValue.Msg
+    | Alpha Alpha.Msg
 
 
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
 update msg color model =
     case msg of
-        SaturationValue saturationValueMsg ->
-            let
-                ( updatedColor, updatedModel ) =
-                    SaturationValue.update saturationValueMsg color model.saturationValue
-            in
-            ( updatedColor, { model | saturationValue = updatedModel } )
-
         Hue hueMsg ->
             let
                 ( updatedColor, updatedModel ) =
@@ -41,10 +38,25 @@ update msg color model =
             in
             ( updatedColor, { model | hue = updatedModel } )
 
+        SaturationValue saturationValueMsg ->
+            let
+                ( updatedColor, updatedModel ) =
+                    SaturationValue.update saturationValueMsg color model.saturationValue
+            in
+            ( updatedColor, { model | saturationValue = updatedModel } )
+
+        Alpha alphaMsg ->
+            let
+                ( updatedColor, updatedModel ) =
+                    Alpha.update alphaMsg color model.alpha
+            in
+            ( updatedColor, { model | alpha = updatedModel } )
+
 
 view : Hsva -> Model -> Html Msg
 view color model =
     div []
-        [ Html.map SaturationValue <| SaturationValue.view color model.saturationValue
-        , Html.map Hue <| Hue.view color model.hue
+        [ Html.map Hue <| Hue.view color model.hue
+        , Html.map SaturationValue <| SaturationValue.view color model.saturationValue
+        , Html.map Alpha <| Alpha.view color model.alpha
         ]

@@ -8,4 +8,5 @@ styles =
         { checkerboard = "checkerboard"
         , thumb = "thumb"
         , hueGradient = "hue-gradient"
+        , slider = "slider"
         }
