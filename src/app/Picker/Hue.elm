@@ -77,4 +77,6 @@ view color model =
         viewBackground =
             div [ styles.class .hueGradient, styles.class .slider ] []
     in
-    Slider.view viewThumb viewBackground relativePosition model
+    div [ styles.class .sliderWrapper ]
+        [ Slider.view viewThumb viewBackground relativePosition model
+        ]

@@ -98,4 +98,6 @@ view color model =
                 , rect [ Svg.Attributes.filter "url(#gradient-multiply)", x "0", y "0", width "100%", height "100%" ] []
                 ]
     in
-    Slider.view viewThumb viewBackground relativePosition model
+    Html.div [ styles.class .matrixWrapper ]
+        [ Slider.view viewThumb viewBackground relativePosition model
+        ]

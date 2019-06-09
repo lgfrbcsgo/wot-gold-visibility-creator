@@ -86,4 +86,6 @@ view color model =
                 [ div [ styles.class .slider, style "background" gradient ] []
                 ]
     in
-    Slider.view viewThumb viewBackground relativePosition model
+    div [ styles.class .sliderWrapper ]
+        [ Slider.view viewThumb viewBackground relativePosition model
+        ]

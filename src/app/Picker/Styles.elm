@@ -9,4 +9,6 @@ styles =
         , thumb = "thumb"
         , hueGradient = "hue-gradient"
         , slider = "slider"
+        , sliderWrapper = "slider-wrapper"
+        , matrixWrapper = "matrix-wrapper"
         }
