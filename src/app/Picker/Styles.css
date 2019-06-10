@@ -29,3 +29,11 @@
 .hue-gradient {
     background: linear-gradient(to right, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%, 50%), hsl(300, 100%, 50%), hsl(360, 100%, 50%))
 }
+
+.black-gradient {
+    background: linear-gradient(to top, black, transparent);
+}
+
+.white-gradient {
+    background: linear-gradient(to right, white, transparent);
+}

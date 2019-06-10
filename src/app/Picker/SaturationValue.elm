@@ -2,12 +2,10 @@ module Picker.SaturationValue exposing (Model, Msg, init, update, view)
 
 import Basics
 import Color exposing (..)
-import Html exposing (Html)
-import Html.Attributes
+import Html exposing (Html, div)
+import Html.Attributes exposing (style)
 import Picker.Styles exposing (styles)
 import Slider
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
 
 
 
@@ -74,30 +72,16 @@ view color model =
             HsvaRecord hue saturation value 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
         viewThumb =
-            Html.div [ styles.class .thumb, Html.Attributes.style "backgroundColor" thumbBackground ] []
+            div [ styles.class .thumb, style "backgroundColor" thumbBackground ] []
 
         viewBackground =
-            svg [ height "100%", width "100%" ]
-                [ defs []
-                    [ linearGradient [ id "gradient-to-black", x1 "0%", x2 "0%", y1 "0%", y2 "100%" ]
-                        [ stop [ offset "0%", stopColor "white" ] []
-                        , stop [ offset "100%", stopColor "black" ] []
-                        ]
-                    , linearGradient [ id "gradient-to-color", x1 "0%", x2 "100%", y1 "0%", y2 "0%" ]
-                        [ stop [ offset "0%", stopColor "white" ] []
-                        , stop [ offset "100%", stopColor gradientColor ] []
-                        ]
-                    , rect [ id "gradient-to-black-rect", width "100%", height "100%", fill "url(#gradient-to-black)" ] []
-                    , rect [ id "gradient-to-color-rect", width "100%", height "100%", fill "url(#gradient-to-color)" ] []
-                    , Svg.filter [ id "gradient-multiply", x "0%", y "0%", width "100%", height "100%", colorInterpolationFilters "sRGB" ]
-                        [ feImage [ width "100%", height "100%", result "black", xlinkHref "#gradient-to-black-rect" ] []
-                        , feImage [ width "100%", height "100%", result "color", xlinkHref "#gradient-to-color-rect" ] []
-                        , feBlend [ in_ "black", in2 "color", mode "multiply" ] []
-                        ]
+            div [ style "height" "10rem", style "width" "100%", style "backgroundColor" gradientColor ]
+                [ div [ styles.class .whiteGradient, style "height" "100%", style "width" "100%" ]
+                    [ div [ styles.class .blackGradient, style "height" "100%", style "width" "100%" ]
+                        []
                     ]
-                , rect [ Svg.Attributes.filter "url(#gradient-multiply)", x "0", y "0", width "100%", height "100%" ] []
                 ]
     in
-    Html.div [ styles.class .matrixWrapper ]
+    div [ styles.class .matrixWrapper ]
         [ Slider.view viewThumb viewBackground relativePosition model
         ]

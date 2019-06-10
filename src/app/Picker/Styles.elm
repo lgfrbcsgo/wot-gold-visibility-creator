@@ -11,4 +11,6 @@ styles =
         , slider = "slider"
         , sliderWrapper = "slider-wrapper"
         , matrixWrapper = "matrix-wrapper"
+        , whiteGradient = "white-gradient"
+        , blackGradient = "black-gradient"
         }
