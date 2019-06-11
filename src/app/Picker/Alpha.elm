@@ -1,4 +1,4 @@
-module Picker.Alpha exposing (Model, Msg, init, update, view)
+module Picker.Alpha exposing (Model, Msg, init, subscriptions, update, view)
 
 import Basics
 import Color exposing (..)
@@ -50,6 +50,15 @@ update msg color model =
 alphaToRelativePosition : Float -> Slider.Position
 alphaToRelativePosition alpha =
     Slider.Position alpha 0.5
+
+
+
+---- SUBSCRIPTIONS ----
+
+
+subscriptions : Model -> Sub Msg
+subscriptions =
+    Slider.subscriptions
 
 
 

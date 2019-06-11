@@ -1,4 +1,4 @@
-module Picker.Hue exposing (Model, Msg, init, update, view)
+module Picker.Hue exposing (Model, Msg, init, subscriptions, update, view)
 
 import Basics
 import Color exposing (..)
@@ -53,6 +53,15 @@ update msg color model =
 hueToRelativePosition : Int -> Slider.Position
 hueToRelativePosition hue =
     Slider.Position (toFloat hue / 360) 0.5
+
+
+
+---- SUBSCRIPTIONS ----
+
+
+subscriptions : Model -> Sub Msg
+subscriptions =
+    Slider.subscriptions
 
 
 

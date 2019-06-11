@@ -1,7 +1,6 @@
 import {Elm} from './app/Main';
 import {Rgba} from './types';
 
-import './custom-elements';
 import './styles.css';
 
 // Fail fast instead of making the app unusable

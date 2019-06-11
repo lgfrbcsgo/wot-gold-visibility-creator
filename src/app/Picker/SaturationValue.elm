@@ -1,4 +1,4 @@
-module Picker.SaturationValue exposing (Model, Msg, init, update, view)
+module Picker.SaturationValue exposing (Model, Msg, init, subscriptions, update, view)
 
 import Basics
 import Color exposing (..)
@@ -50,6 +50,15 @@ update msg color model =
 saturationValueToRelativePosition : Float -> Float -> Slider.Position
 saturationValueToRelativePosition saturation value =
     Slider.Position saturation (1 - value)
+
+
+
+---- SUBSCRIPTIONS ----
+
+
+subscriptions : Model -> Sub Msg
+subscriptions =
+    Slider.subscriptions
 
 
 

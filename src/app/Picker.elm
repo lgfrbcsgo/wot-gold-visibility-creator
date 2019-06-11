@@ -1,4 +1,4 @@
-module Picker exposing (Model, Msg, init, update, view)
+module Picker exposing (Model, Msg, init, subscriptions, update, view)
 
 import Color exposing (..)
 import Html exposing (Html, div)
@@ -51,6 +51,15 @@ update msg color model =
                     Alpha.update alphaMsg color model.alpha
             in
             ( updatedColor, { model | alpha = updatedModel } )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Sub.map Hue <| Hue.subscriptions model.hue
+        , Sub.map SaturationValue <| SaturationValue.subscriptions model.saturationValue
+        , Sub.map Alpha <| Alpha.subscriptions model.alpha
+        ]
 
 
 view : Hsva -> Model -> Html Msg

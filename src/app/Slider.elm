@@ -1,18 +1,12 @@
-module Slider exposing (Model, Msg, Position, init, update, view)
+module Slider exposing (Model, Msg, Position, init, subscriptions, update, view)
 
 import Basics
+import Browser.Events
 import CssModules exposing (css)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Json.Decode as Decode
-
-
-styles =
-    css "./Slider.css"
-        { dragContainer = "drag-container"
-        , thumb = "thumb"
-        }
 
 
 
@@ -147,6 +141,40 @@ clamp min max value =
 
 
 
+---- SUBSCRIPTIONS ----
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    case model of
+        Dragging _ ->
+            Sub.batch
+                [ Browser.Events.onMouseMove <|
+                    Decode.map Drag decodePagePosition
+                , Browser.Events.onMouseUp <|
+                    Decode.succeed DragEnd
+                ]
+
+        ThumbClicked ->
+            Browser.Events.onMouseUp <|
+                Decode.succeed DragEnd
+
+        Resting ->
+            Sub.none
+
+
+
+---- STYLES ----
+
+
+styles =
+    css "./Slider.css"
+        { dragContainer = "drag-container"
+        , thumb = "thumb"
+        }
+
+
+
 ---- VIEW ----
 
 
@@ -171,10 +199,7 @@ view viewThumb viewBody relativePosition model =
                     ]
 
                 _ ->
-                    [ Html.Events.on "pointerdown" <|
-                        failIfNotPrimary <|
-                            Decode.succeed ThumbClick
-                    ]
+                    [ Html.Events.onMouseDown ThumbClick ]
 
         backgroundListeners =
             case model of
@@ -182,67 +207,27 @@ view viewThumb viewBody relativePosition model =
                     []
 
                 _ ->
-                    [ Html.Events.on "pointerdown" <|
-                        failIfNotPrimary <|
-                            Decode.map DragStart <|
-                                Decode.map3 DragContext decodeSize decodeOffsetPosition decodePagePosition
+                    [ Html.Events.on "mousedown" <|
+                        Decode.map DragStart <|
+                            Decode.map3 DragContext decodeSize decodeOffsetPosition decodePagePosition
                     ]
-
-        windowListeners =
-            case model of
-                Dragging _ ->
-                    [ Html.Events.on "pointermove" <|
-                        failIfNotPrimary <|
-                            Decode.map Drag decodePagePosition
-                    , Html.Events.on "pointerup" <|
-                        failIfNotPrimary <|
-                            Decode.succeed DragEnd
-                    ]
-
-                ThumbClicked ->
-                    [ Html.Events.on "pointerup" <|
-                        failIfNotPrimary <|
-                            Decode.succeed DragEnd
-                    ]
-
-                Resting ->
-                    []
     in
-    Html.node "window-event-proxy"
-        windowListeners
+    Html.div
+        (backgroundListeners
+            ++ [ styles.class .dragContainer
+               ]
+        )
         [ Html.div
-            (backgroundListeners
-                ++ [ styles.class .dragContainer
+            (thumbListeners
+                ++ [ styles.class .thumb
+                   , Html.Attributes.style "top" thumbTop
+                   , Html.Attributes.style "left" thumbLeft
                    ]
             )
-            [ Html.div
-                (thumbListeners
-                    ++ [ styles.class .thumb
-                       , Html.Attributes.style "top" thumbTop
-                       , Html.Attributes.style "left" thumbLeft
-                       ]
-                )
-                [ Html.map (always DragEnd) viewThumb
-                ]
-            , Html.map (always DragEnd) viewBody
+            [ Html.map (always DragEnd) viewThumb
             ]
+        , Html.map (always DragEnd) viewBody
         ]
-
-
-failIfNotPrimary : Decode.Decoder a -> Decode.Decoder a
-failIfNotPrimary decoder =
-    Decode.field "isPrimary" Decode.bool
-        |> Decode.andThen (failIfNotPrimaryHelper decoder)
-
-
-failIfNotPrimaryHelper : Decode.Decoder a -> Bool -> Decode.Decoder a
-failIfNotPrimaryHelper decoder bool =
-    case bool of
-        True ->
-            decoder
-
-        False ->
-            Decode.fail "is not primary pointer"
 
 
 decodePagePosition : Decode.Decoder Position
