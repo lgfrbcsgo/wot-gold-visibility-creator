@@ -4,7 +4,7 @@ import {Rgba} from './types';
 import './styles.css';
 
 // Fail fast instead of making the app unusable
-if (!self.PointerEvent || !self.WebAssembly) {
+if (!self.WebAssembly) {
     throw new Error("Browser not supported");
 }
 

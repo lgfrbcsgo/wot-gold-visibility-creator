@@ -4,12 +4,6 @@ const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WorkerPlugin = require('worker-plugin');
 
-const tailwindcss = require('tailwindcss');
-const purgecss = require('@fullhuman/postcss-purgecss');
-const cssnano = require('cssnano');
-const autoprefixer = require('autoprefixer');
-
-
 const project = __dirname;
 const dist = path.resolve(project, 'dist');
 const wasm = path.resolve(project, 'src/worker/wasm');
@@ -54,8 +48,16 @@ const createConfig = (inProdMode, inDevMode) => ({
             },
             {
                 test: /\.ts$/,
-                use: 'ts-loader',
-                exclude: /node_modules/
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-typescript'],
+                        plugins: [
+                            '@babel/plugin-proposal-object-rest-spread',
+                            '@babel/plugin-syntax-dynamic-import'
+                        ]
+                    }
+                }
             },
             {
                 test: /\.css$/,
@@ -65,44 +67,20 @@ const createConfig = (inProdMode, inDevMode) => ({
                         loader: 'css-loader',
                         options: {
                             modules: true,
-                            importLoaders: 1
-                        }
-                    },
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            ident: 'postcss',
-                            plugins: [
-                                tailwindcss(),
-                                purgecss({
-                                    content: [
-                                        './src/**/*.elm',
-                                        './src/**/*.ts'
-                                    ],
-                                }),
-                                ...inProdMode([
-                                    cssnano({
-                                        preset: 'default',
-                                    }),
-                                    autoprefixer
-                                ])
-                            ]
                         }
                     }
                 ]
             },
             {
                 test: /\.(png|svg)$/,
-                use: [
-                    {
-                        loader: 'url-loader',
-                        options: {
-                            limit: 8192,
-                            fallback: 'file-loader',
-                            name: '[hash].[ext]'
-                        }
+                use: {
+                    loader: 'url-loader',
+                    options: {
+                        limit: 8192,
+                        fallback: 'file-loader',
+                        name: '[hash].[ext]'
                     }
-                ],
+                }
             }
         ]
     },
