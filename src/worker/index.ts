@@ -7,8 +7,10 @@ const worker = new Worker('./worker', {type: 'module'});
 const creatorWorker = initializeCreatorWorker(worker);
 
 export async function createModPackage(color: Rgba): Promise<Uint8Array> {
-    const worker = await creatorWorker;
-    return await worker.create(color);
+    // keep a reference to the worker, otherwise Edge will garbage collect the worker!
+    worker;
+    const initializedWorker = await creatorWorker;
+    return await initializedWorker.create(color);
 }
 
 async function initializeCreatorWorker(worker: Worker): Promise<CreatorWorker> {
