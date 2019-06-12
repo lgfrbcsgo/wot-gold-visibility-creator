@@ -22,16 +22,19 @@ const createConfig = (inProdMode, inDevMode) => ({
         globalObject: 'self'
     },
     resolve: {
-        extensions: ['.ts', '.js', '.wasm', '.json', '.elm']
+        extensions: ['.elm', '.wasm', '.ts', '.mjs', '.js', '.json']
     },
     module: {
         rules: [
             {
                 test: /\.elm$/,
-                exclude: [/elm-stuff/, /node_modules/],
                 use: [
-                    { loader: 'elm-css-modules-loader' },
-                    { loader: 'elm-hot-webpack-loader' },
+                    {
+                        loader: 'elm-css-modules-loader'
+                    },
+                    {
+                        loader: 'elm-hot-webpack-loader'
+                    },
                     {
                         loader: 'elm-webpack-loader',
                         options: {
@@ -47,8 +50,10 @@ const createConfig = (inProdMode, inDevMode) => ({
                 ]
             },
             {
-                test: /\.(ts|js)$/,
-                use:  { loader: 'babel-loader' }
+                test: /\.(ts|mjs|js)$/,
+                use:  {
+                    loader: 'babel-loader'
+                }
             },
             {
                 test: /\.css$/,

@@ -1,6 +1,6 @@
 import {expose, transfer, proxy} from 'comlink';
-import {CreatorWorkerInitializer} from "./types";
-import {Rgba} from "../types";
+import {CreatorWorkerInitializer} from './types';
+import {Rgba} from '../types';
 
 const setupWasmWorker: CreatorWorkerInitializer = async config => {
     const { WasmCreatorWorker } = await import('./wasm/pkg');
