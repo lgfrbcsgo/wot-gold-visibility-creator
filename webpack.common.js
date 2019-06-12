@@ -51,6 +51,10 @@ const createConfig = (inProdMode, inDevMode) => ({
             },
             {
                 test: /\.(ts|mjs|js)$/,
+                include: [
+                    path.resolve('src'),
+                    path.resolve('node_modules/comlink')
+                ],
                 use:  {
                     loader: 'babel-loader'
                 }
