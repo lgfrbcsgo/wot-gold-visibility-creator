@@ -18,6 +18,7 @@ const createConfig = (inProdMode, inDevMode) => ({
     }),
     output: {
         path: dist,
+        publicPath: '/wot-gold-visibility-creator/',
         filename: '[name].[hash].js',
         globalObject: 'self'
     },
