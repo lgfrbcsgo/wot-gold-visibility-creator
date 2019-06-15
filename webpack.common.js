@@ -6,7 +6,7 @@ const WorkerPlugin = require('worker-plugin');
 
 const project = __dirname;
 const dist = path.resolve(project, 'dist');
-const wasm = path.resolve(project, 'src/worker/wasm');
+const src = path.resolve(project, 'src');
 
 const createConfig = (inProdMode, inDevMode) => ({
     entry: './src/index.ts',
@@ -53,7 +53,7 @@ const createConfig = (inProdMode, inDevMode) => ({
             {
                 test: /\.(ts|mjs|js)$/,
                 include: [
-                    path.resolve('src'),
+                    src,
                     path.resolve('node_modules/comlink')
                 ],
                 use:  {
@@ -92,10 +92,10 @@ const createConfig = (inProdMode, inDevMode) => ({
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            template: 'src/index.html'
+            template: path.resolve(src, 'index.html')
         }),
         new WasmPackPlugin({
-            crateDirectory: wasm,
+            crateDirectory: path.resolve(src, 'worker/wasm'),
             forceMode: 'production'
         }),
         new WorkerPlugin({

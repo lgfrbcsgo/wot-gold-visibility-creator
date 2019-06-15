@@ -11,7 +11,7 @@ extern crate error_chain;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-pub fn use_panic_hook() {
+pub fn set_panic_hook() {
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
 }
@@ -124,12 +124,14 @@ struct WasmCreatorWorker {
 impl WasmCreatorWorker {
     #[wasm_bindgen(constructor)]
     pub fn new(textures: JsTextureConfigArray) -> WasmCreatorWorker {
+        set_panic_hook();
         WasmCreatorWorker {
             texture_configs: textures.into()
         }
     }
 
     pub fn create(&self, color: JsColor) -> Vec<u8> {
+        set_panic_hook();
         create_package(&self.texture_configs, &color.into())
             .unwrap_throw()
     }
