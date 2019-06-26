@@ -12,13 +12,13 @@ import Slider
 ---- Model ----
 
 
-type alias Model =
-    Slider.Model
+type Model
+    = Model Slider.Model
 
 
-init : Slider.Model
+init : Model
 init =
-    Slider.init
+    Model Slider.init
 
 
 
@@ -30,7 +30,7 @@ type alias Msg =
 
 
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
-update msg color model =
+update msg color (Model model) =
     let
         { hue, saturation, value, alpha } =
             fromHsva color
@@ -47,7 +47,7 @@ update msg color model =
         updatedColor =
             HsvaRecord updatedHue saturation value alpha |> hsva
     in
-    ( updatedColor, updatedModel )
+    ( updatedColor, Model updatedModel )
 
 
 hueToRelativePosition : Int -> Slider.Position
@@ -60,8 +60,8 @@ hueToRelativePosition hue =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions =
-    Slider.subscriptions
+subscriptions (Model model) =
+    Slider.subscriptions model
 
 
 
@@ -69,7 +69,7 @@ subscriptions =
 
 
 view : Hsva -> Model -> Html Msg
-view color model =
+view color (Model model) =
     let
         { hue } =
             fromHsva color
