@@ -193,6 +193,7 @@ view viewThumb viewBody relativePosition model =
         thumbListeners =
             case model of
                 Dragging _ ->
+                    -- prevent default to prevent native drag and drop behavior
                     [ Html.Events.preventDefaultOn "dragstart" <|
                         Decode.map (\msg -> ( msg, True )) <|
                             Decode.succeed NoOp
@@ -207,8 +208,11 @@ view viewThumb viewBody relativePosition model =
                     []
 
                 _ ->
-                    [ Html.Events.on "mousedown" <|
-                        Decode.map DragStart <|
+                    {- prevent default to prevent text selection on drag
+                       since the thumb is a child of the background, it is enough to prevent the default only on the background
+                    -}
+                    [ Html.Events.preventDefaultOn "mousedown" <|
+                        Decode.map (\context -> ( DragStart context, True )) <|
                             Decode.map3 DragContext decodeSize decodeOffsetPosition decodePagePosition
                     ]
     in
