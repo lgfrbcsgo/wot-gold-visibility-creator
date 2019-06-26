@@ -18,9 +18,11 @@ const createConfig = (inProdMode, inDevMode) => ({
     }),
     output: {
         path: dist,
-        publicPath: '/wot-gold-visibility-creator/',
         filename: '[name].[hash].js',
-        globalObject: 'self'
+        globalObject: 'self',
+        ...inProdMode({
+            publicPath: '/wot-gold-visibility-creator/',
+        })
     },
     resolve: {
         extensions: ['.elm', '.wasm', '.ts', '.mjs', '.js', '.json']
