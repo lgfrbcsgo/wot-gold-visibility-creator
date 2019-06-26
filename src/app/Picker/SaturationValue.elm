@@ -25,12 +25,12 @@ init =
 ---- UPDATE ----
 
 
-type alias Msg =
-    Slider.Msg
+type Msg
+    = Msg Slider.Msg
 
 
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
-update msg color (Model model) =
+update (Msg msg) color (Model model) =
     let
         { hue, saturation, value, alpha } =
             fromHsva color
@@ -58,7 +58,7 @@ saturationValueToRelativePosition saturation value =
 
 subscriptions : Model -> Sub Msg
 subscriptions (Model model) =
-    Slider.subscriptions model
+    Slider.subscriptions model |> Sub.map Msg
 
 
 
@@ -94,3 +94,4 @@ view color (Model model) =
     div [ styles.class .matrixWrapper ]
         [ Slider.view viewThumb viewBackground relativePosition model
         ]
+        |> Html.map Msg
