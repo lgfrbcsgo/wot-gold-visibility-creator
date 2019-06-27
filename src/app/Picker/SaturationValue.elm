@@ -84,14 +84,14 @@ view color (Model model) =
             div [ styles.class .thumb, style "backgroundColor" thumbBackground ] []
 
         viewBackground =
-            div [ style "height" "10rem", style "width" "100%", style "backgroundColor" gradientColor ]
-                [ div [ styles.class .whiteGradient, style "height" "100%", style "width" "100%" ]
-                    [ div [ styles.class .blackGradient, style "height" "100%", style "width" "100%" ]
+            div [ styles.class .fill, style "backgroundColor" gradientColor ]
+                [ div [ styles.class .whiteGradient, styles.class .fill ]
+                    [ div [ styles.class .blackGradient, styles.class .fill ]
                         []
                     ]
                 ]
     in
-    div [ styles.class .matrixWrapper ]
+    div [ styles.class .matrix ]
         [ Slider.view viewThumb viewBackground relativePosition model
         ]
         |> Html.map Msg

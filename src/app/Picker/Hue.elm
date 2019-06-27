@@ -84,9 +84,9 @@ view color (Model model) =
             div [ styles.class .thumb, style "backgroundColor" thumbBackground ] []
 
         viewBackground =
-            div [ styles.class .hueGradient, styles.class .slider ] []
+            div [ styles.class .hueGradient, styles.class .fill ] []
     in
-    div [ styles.class .sliderWrapper ]
+    div [ styles.class .slider ]
         [ Slider.view viewThumb viewBackground relativePosition model
         ]
         |> Html.map Msg

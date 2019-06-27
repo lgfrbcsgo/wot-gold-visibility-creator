@@ -5,6 +5,7 @@ import Html exposing (Html, div)
 import Picker.Alpha as Alpha
 import Picker.Hue as Hue
 import Picker.SaturationValue as SaturationValue
+import Picker.Styles exposing (styles)
 
 
 type alias Model =
@@ -55,7 +56,7 @@ subscriptions model =
 
 view : Hsva -> Model -> Html Msg
 view color model =
-    div []
+    div [ styles.class .picker ]
         [ Hue.view color model.hue |> Html.map Hue
         , SaturationValue.view color model.saturationValue |> Html.map SaturationValue
         , Alpha.view color model.alpha |> Html.map Alpha

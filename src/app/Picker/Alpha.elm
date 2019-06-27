@@ -83,19 +83,16 @@ view color (Model model) =
         viewThumb =
             div [ styles.class .thumb, styles.class .checkerboard ]
                 [ div
-                    [ style "backgroundColor" (color |> hsvaToRgba |> rgbaToCss)
-                    , style "height" "100%"
-                    , style "width" "100%"
-                    ]
+                    [ styles.class .fill, style "backgroundColor" (color |> hsvaToRgba |> rgbaToCss) ]
                     []
                 ]
 
         viewBackground =
             div [ styles.class .checkerboard ]
-                [ div [ styles.class .slider, style "background" gradient ] []
+                [ div [ styles.class .fill, style "background" gradient ] []
                 ]
     in
-    div [ styles.class .sliderWrapper ]
+    div [ styles.class .slider ]
         [ Slider.view viewThumb viewBackground relativePosition model
         ]
         |> Html.map Msg

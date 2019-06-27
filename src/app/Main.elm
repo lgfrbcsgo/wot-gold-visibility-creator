@@ -118,9 +118,7 @@ subscriptions model =
 
 styles =
     css "./Main.css"
-        { btn = "btn"
-        , btnBlue = "btn-blue"
-        , picker = "picker"
+        { picker = "picker"
         }
 
 
@@ -131,7 +129,7 @@ styles =
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ styles.class .btn, styles.class .btnBlue, onClick CreateModPackage ] [ text "Run" ]
+        [ button [ onClick CreateModPackage ] [ text "Run" ]
         , div [ styles.class .picker ] [ Picker.view model.color model.picker |> map Picker ]
         ]
 

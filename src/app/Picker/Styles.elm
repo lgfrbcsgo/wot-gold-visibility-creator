@@ -5,12 +5,13 @@ import CssModules exposing (css)
 
 styles =
     css "./Picker/Styles.css"
-        { checkerboard = "checkerboard"
+        { picker = "picker"
+        , slider = "slider"
+        , matrix = "matrix"
+        , checkerboard = "checkerboard"
+        , fill = "fill"
         , thumb = "thumb"
         , hueGradient = "hue-gradient"
-        , slider = "slider"
-        , sliderWrapper = "slider-wrapper"
-        , matrixWrapper = "matrix-wrapper"
         , whiteGradient = "white-gradient"
         , blackGradient = "black-gradient"
         }
