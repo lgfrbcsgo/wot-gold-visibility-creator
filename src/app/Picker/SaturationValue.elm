@@ -85,12 +85,9 @@ view color (Model model) =
 
         viewBackground =
             div [ styles.class .fill ]
-                [ div [ styles.class .background, styles.class .fillHack, style "backgroundColor" gradientColor ]
-                    []
-                , div [ styles.class .background, styles.class .whiteGradient, styles.class .absolute, styles.class .fill ]
-                    []
-                , div [ styles.class .background, styles.class .blackGradient, styles.class .absolute, styles.class .fill ]
-                    []
+                [ div [ styles.class .saturationValueBackgroundHack, style "backgroundColor" gradientColor ] []
+                , div [ styles.class .saturationValueBackground, styles.class .whiteGradient ] []
+                , div [ styles.class .saturationValueBackground, styles.class .blackGradient ] []
                 ]
     in
     div [ styles.class .matrix ]
