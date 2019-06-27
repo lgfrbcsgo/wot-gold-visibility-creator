@@ -58,18 +58,25 @@ const createConfig = (inProdMode, inDevMode) => ({
                     src,
                     path.resolve('node_modules/comlink')
                 ],
-                use:  {
+                use: {
                     loader: 'babel-loader'
                 }
             },
             {
                 test: /\.css$/,
                 use: [
-                    { loader:  'style-loader' },
+                    {loader: 'style-loader'},
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
+                            modules: {
+                                ...inDevMode({
+                                    localIdentName: '[path][name]__[local]--[hash:base64:5]'
+                                }),
+                                ...inProdMode({
+                                    localIdentName: '[hash:base64]'
+                                })
+                            }
                         }
                     }
                 ]
