@@ -221,16 +221,16 @@ view viewThumb viewBody relativePosition model =
             ++ [ styles.class .dragContainer
                ]
         )
-        [ Html.div
+        [ viewBody
+        , Html.div
             (thumbListeners
                 ++ [ styles.class .thumb
                    , Html.Attributes.style "top" thumbTop
                    , Html.Attributes.style "left" thumbLeft
                    ]
             )
-            [ Html.map (always DragEnd) viewThumb
+            [ viewThumb
             ]
-        , Html.map (always DragEnd) viewBody
         ]
 
 
