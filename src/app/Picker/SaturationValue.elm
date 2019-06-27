@@ -84,11 +84,13 @@ view color (Model model) =
             div [ styles.class .thumb, style "backgroundColor" thumbBackground ] []
 
         viewBackground =
-            div [ styles.class .fill, style "backgroundColor" gradientColor ]
-                [ div [ styles.class .whiteGradient, styles.class .fill ]
-                    [ div [ styles.class .blackGradient, styles.class .fill ]
-                        []
-                    ]
+            div [ styles.class .fill ]
+                [ div [ styles.class .background, styles.class .fillHack, style "backgroundColor" gradientColor ]
+                    []
+                , div [ styles.class .background, styles.class .whiteGradient, styles.class .absolute, styles.class .fill ]
+                    []
+                , div [ styles.class .background, styles.class .blackGradient, styles.class .absolute, styles.class .fill ]
+                    []
                 ]
     in
     div [ styles.class .matrix ]

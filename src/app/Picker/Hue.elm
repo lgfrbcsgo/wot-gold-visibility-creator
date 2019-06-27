@@ -84,7 +84,7 @@ view color (Model model) =
             div [ styles.class .thumb, style "backgroundColor" thumbBackground ] []
 
         viewBackground =
-            div [ styles.class .hueGradient, styles.class .fill ] []
+            div [ styles.class .hueGradient, styles.class .fill, styles.class .background ] []
     in
     div [ styles.class .slider ]
         [ Slider.view viewThumb viewBackground relativePosition model

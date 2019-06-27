@@ -88,7 +88,7 @@ view color (Model model) =
                 ]
 
         viewBackground =
-            div [ styles.class .checkerboard ]
+            div [ styles.class .checkerboard, styles.class .background ]
                 [ div [ styles.class .fill, style "background" gradient ] []
                 ]
     in
