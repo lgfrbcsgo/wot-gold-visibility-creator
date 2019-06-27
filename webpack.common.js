@@ -71,10 +71,10 @@ const createConfig = (inProdMode, inDevMode) => ({
                         options: {
                             modules: {
                                 ...inDevMode({
-                                    localIdentName: '[path][name]__[local]--[hash:base64:5]'
+                                    localIdentName: '[path][name]__[local]--[hash:base62:5]'
                                 }),
                                 ...inProdMode({
-                                    localIdentName: '[hash:base64]'
+                                    localIdentName: '[hash:base62]'
                                 })
                             }
                         }
