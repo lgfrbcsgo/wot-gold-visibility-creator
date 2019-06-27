@@ -10,6 +10,8 @@ const setupWasmWorker: CreatorWorkerInitializer = async config => {
             return transfer(data, [data.buffer]);
         }
     }
+    // proxying return values leaks memory https://github.com/GoogleChromeLabs/comlink/issues/63
+    // this is fine here since ideally this function should ever be called once
     return proxy(new TransferringCreatorWorker(config));
 };
 
