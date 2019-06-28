@@ -84,11 +84,17 @@ view color (Model model) =
             HsvaRecord hue saturation value 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
         viewThumb =
-            div [ styles.class .thumb, style "backgroundColor" thumbBackground ] []
+            div [ styles.class .thumb ]
+                [ div [ style "backgroundColor" thumbBackground ]
+                    []
+                ]
 
         viewBackground =
-            div [ styles.class .fill, styles.class .background, style "background" gradient ]
-                [ div [ styles.class .fill, styles.class .blackGradient ] []
+            div [ styles.class .background ]
+                [ div [ style "background" gradient ]
+                    [ div [ styles.class .blackGradient ]
+                        []
+                    ]
                 ]
     in
     div [ styles.class .matrix ]

@@ -81,15 +81,19 @@ view color (Model model) =
             "linear-gradient(to right, transparent, " ++ gradientColor ++ ")"
 
         viewThumb =
-            div [ styles.class .thumb, styles.class .checkerboard ]
-                [ div
-                    [ styles.class .fill, style "backgroundColor" (color |> hsvaToRgba |> rgbaToCss) ]
-                    []
+            div [ styles.class .thumb ]
+                [ div [ styles.class .checkerboard ]
+                    [ div [ style "backgroundColor" (color |> hsvaToRgba |> rgbaToCss) ]
+                        []
+                    ]
                 ]
 
         viewBackground =
-            div [ styles.class .checkerboard, styles.class .background ]
-                [ div [ styles.class .fill, style "background" gradient ] []
+            div [ styles.class .background ]
+                [ div [ styles.class .checkerboard ]
+                    [ div [ style "background" gradient ]
+                        []
+                    ]
                 ]
     in
     div [ styles.class .slider ]

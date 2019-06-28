@@ -81,10 +81,14 @@ view color (Model model) =
             HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
         viewThumb =
-            div [ styles.class .thumb, style "backgroundColor" thumbBackground ] []
+            div [ styles.class .thumb ]
+                [ div [ style "backgroundColor" thumbBackground ]
+                    []
+                ]
 
         viewBackground =
-            div [ styles.class .hueGradient, styles.class .fill, styles.class .background ] []
+            div [ styles.class .hueGradient, styles.class .background ]
+                []
     in
     div [ styles.class .slider ]
         [ Slider.view viewThumb viewBackground relativePosition model
