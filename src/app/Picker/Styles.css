@@ -32,19 +32,6 @@
     overflow: hidden;
 }
 
-.saturation-value-background {
-    composes: fill background;
-    position: absolute;
-}
-
-.saturation-value-background-hack {
-    composes: background;
-    position: absolute;
-    width: calc(100% - 1px);
-    height: calc(100% - 1px);
-    left: 1px;
-}
-
 .thumb {
     width: 1.5rem;
     height: 1.5rem;
@@ -59,8 +46,4 @@
 
 .black-gradient {
     background: linear-gradient(to top, black, transparent);
-}
-
-.white-gradient {
-    background: linear-gradient(to right, white, transparent);
 }

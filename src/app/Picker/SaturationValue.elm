@@ -77,6 +77,9 @@ view color (Model model) =
         gradientColor =
             HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
+        gradient =
+            "linear-gradient(to right, white, " ++ gradientColor ++ ")"
+
         thumbBackground =
             HsvaRecord hue saturation value 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
@@ -84,10 +87,8 @@ view color (Model model) =
             div [ styles.class .thumb, style "backgroundColor" thumbBackground ] []
 
         viewBackground =
-            div [ styles.class .fill ]
-                [ div [ styles.class .saturationValueBackgroundHack, style "backgroundColor" gradientColor ] []
-                , div [ styles.class .saturationValueBackground, styles.class .whiteGradient ] []
-                , div [ styles.class .saturationValueBackground, styles.class .blackGradient ] []
+            div [ styles.class .fill, styles.class .background, style "background" gradient ]
+                [ div [ styles.class .fill, styles.class .blackGradient ] []
                 ]
     in
     div [ styles.class .matrix ]
