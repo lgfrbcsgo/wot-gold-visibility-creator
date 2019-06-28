@@ -80,12 +80,12 @@ view color (Model model) =
         gradient =
             "linear-gradient(to right, white, " ++ gradientColor ++ ")"
 
-        thumbBackground =
+        thumbBackgroundColor =
             HsvaRecord hue saturation value 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
         viewThumb =
             div [ styles.class .thumb ]
-                [ div [ style "backgroundColor" thumbBackground ]
+                [ div [ style "backgroundColor" thumbBackgroundColor ]
                     []
                 ]
 

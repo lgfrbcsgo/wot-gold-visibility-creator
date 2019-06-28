@@ -8,10 +8,9 @@ styles =
         { picker = "picker"
         , slider = "slider"
         , matrix = "matrix"
-        , checkerboard = "checkerboard"
-        , fill = "fill"
         , background = "background"
         , thumb = "thumb"
+        , checkerboard = "checkerboard"
         , hueGradient = "hue-gradient"
         , blackGradient = "black-gradient"
         }
