@@ -145,10 +145,14 @@ styles =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [ styles.class .picker ] [ Picker.view model.color model.picker |> map Picker ]
-        , button [ onClick CreateModPackage ] [ text "Run" ]
-        ]
+    if model.running then
+        text "Running..."
+
+    else
+        div []
+            [ div [ styles.class .picker ] [ Picker.view model.color model.picker |> map Picker ]
+            , button [ onClick CreateModPackage ] [ text "Run" ]
+            ]
 
 
 
