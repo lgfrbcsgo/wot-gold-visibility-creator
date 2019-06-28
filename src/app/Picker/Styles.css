@@ -6,13 +6,23 @@
 
 .picker .slider {
     flex: 0 1 auto;
-    padding: 0.75rem 1rem;
     height: 0.5rem;
 }
 
 .picker .matrix {
     flex: 1 1 auto;
-    padding: 1rem;
+}
+
+.picker .slider + .matrix {
+    margin-top: 1.75rem;
+}
+
+.picker .matrix + .slider {
+    margin-top: 1.75rem;
+}
+
+.picker .slider + .slider {
+    margin-top: 1.5rem;
 }
 
 .background {
