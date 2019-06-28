@@ -8,6 +8,7 @@ import Html.Events exposing (..)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Picker as Picker
+import Random
 
 
 port startWorker : Encode.Value -> Cmd msg
@@ -36,8 +37,18 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( Model (hsva (HsvaRecord 360 1 1 1)) Picker.init False
-    , Cmd.none
+    , Random.generate RandomColor randomColor
     )
+
+
+randomColor : Random.Generator Hsva
+randomColor =
+    Random.map hsva <|
+        Random.map4 HsvaRecord
+            (Random.int 0 360)
+            (Random.float 0.5 1)
+            (Random.float 0.65 1)
+            (Random.float 1 1)
 
 
 
@@ -48,6 +59,7 @@ type Msg
     = CreateModPackage
     | FinishedModPackage
     | Picker Picker.Msg
+    | RandomColor Hsva
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -77,6 +89,11 @@ update msg model =
                 | color = updatedColor
                 , picker = updatedPickerModel
               }
+            , Cmd.none
+            )
+
+        RandomColor color ->
+            ( { model | color = color }
             , Cmd.none
             )
 
