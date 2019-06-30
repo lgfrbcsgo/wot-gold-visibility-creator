@@ -80,16 +80,15 @@ view color (Model model) =
         gradient =
             "linear-gradient(to right, transparent, " ++ gradientColor ++ ")"
 
+        thumbBackgroundColor =
+            color |> hsvaToRgba |> rgbaToCss
+
         viewThumb =
-            div [ styles.class .checkerboard ]
-                [ div [ style "backgroundColor" (color |> hsvaToRgba |> rgbaToCss) ]
-                    []
-                ]
+            div [ styles.class .checkerboard, style "backgroundColor" thumbBackgroundColor ]
+                []
 
         viewBackground =
-            div [ styles.class .checkerboard ]
-                [ div [ style "background" gradient ]
-                    []
-                ]
+            div [ styles.class .checkerboard, style "background" gradient ]
+                []
     in
     slider Msg viewThumb viewBackground relativePosition model
