@@ -2,11 +2,11 @@
   "textures": [
     {
       "src": "deferred.png",
-      "packagePath": "res/particles/content_deferred/PFX_textures/eff_tex.dds"
+      "packagePath": "res/particles/content_deferred/PFX_textures/eff_tex_prem.dds"
     },
     {
       "src": "forward.png",
-      "packagePath": "res/particles/content_forward/PFX_textures/eff_tex.dds"
+      "packagePath": "res/particles/content_forward/PFX_textures/eff_tex_prem.dds"
     }
   ]
 }

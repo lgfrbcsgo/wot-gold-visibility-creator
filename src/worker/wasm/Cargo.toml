@@ -13,10 +13,6 @@ version = "0.21.1"
 default-features = false
 features = ["dxt"]
 
-[dependencies.zip]
-version = "0.5.2"
-default-features = false
-
 [dependencies]
 ddsfile = "0.2.3"
 error-chain = "0.12.1"

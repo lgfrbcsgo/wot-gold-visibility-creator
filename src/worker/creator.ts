@@ -3,7 +3,7 @@ import {CreatorWorkerInitializer} from './types';
 import {Rgba} from '../types';
 
 const setupWasmWorker: CreatorWorkerInitializer = async config => {
-    const WasmCreatorWorker = await lazyLoadWorker();
+    const { WasmCreatorWorker } = await import('./wasm/pkg');
     class TransferringCreatorWorker extends WasmCreatorWorker {
         create(color: Rgba) {
             const data = super.create(color);
@@ -16,12 +16,3 @@ const setupWasmWorker: CreatorWorkerInitializer = async config => {
 };
 
 expose(setupWasmWorker);
-
-async function lazyLoadWorker() {
-    if (!self.TextEncoder || !self.TextDecoder) {
-        // polyfill required by Edge
-        Object.assign(self, await import('text-encoding'));
-    }
-    const { WasmCreatorWorker } = await import('./wasm/pkg');
-    return WasmCreatorWorker;
-}

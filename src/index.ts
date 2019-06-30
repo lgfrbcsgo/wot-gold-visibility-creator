@@ -18,8 +18,7 @@ app.ports.startWorker.subscribe(color => {
 
 async function createAndSaveModPackage(color: Rgba) {
     const { createModPackage } = await import('./worker');
-    const buffer = await createModPackage(color);
-    const blob = new Blob([buffer]);
+    const blob = await createModPackage(color);
     saveBlob(blob, 'goldvisibility.color.wotmod');
 }
 

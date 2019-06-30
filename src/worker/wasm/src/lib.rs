@@ -72,67 +72,28 @@ impl Into<ImageData> for JsImageData {
     }
 }
 
-#[wasm_bindgen]
-extern "C" {
-    pub type JsTextureConfig;
-
-    #[wasm_bindgen(method, getter = packagePath)]
-    fn package_path(this: &JsTextureConfig) -> String;
-
-    #[wasm_bindgen(method, getter = imageData)]
-    fn image_data(this: &JsTextureConfig) -> JsImageData;
-}
-
-impl Into<TextureConfig> for JsTextureConfig {
-    fn into(self) -> TextureConfig {
-        TextureConfig {
-            package_path: self.package_path(),
-            image_data: self.image_data().into()
-        }
-    }
-}
-
-#[wasm_bindgen]
-extern "C" {
-    pub type JsTextureConfigArray;
-
-    #[wasm_bindgen(method, structural, indexing_getter)]
-    fn get(this: &JsTextureConfigArray, index: u32) -> JsTextureConfig;
-
-    #[wasm_bindgen(method, getter)]
-    fn length(this: &JsTextureConfigArray) -> u32;
-}
-
-impl Into<Vec<TextureConfig>> for JsTextureConfigArray {
-    fn into(self) -> Vec<TextureConfig> {
-        let range = 0..self.length();
-        range
-            .map(|index| self.get(index).into())
-            .collect::<Vec<TextureConfig>>()
-    }
-}
 
 // Rust exports
 
 
 #[wasm_bindgen]
 struct WasmCreatorWorker {
-    texture_configs: Vec<TextureConfig>
+    image_data: ImageData
 }
 
 #[wasm_bindgen]
 impl WasmCreatorWorker {
     #[wasm_bindgen(constructor)]
-    pub fn new(textures: JsTextureConfigArray) -> WasmCreatorWorker {
+    pub fn new(image_data: JsImageData) -> WasmCreatorWorker {
         set_panic_hook();
         WasmCreatorWorker {
-            texture_configs: textures.into()
+            image_data: image_data.into()
         }
     }
 
     pub fn create(&self, color: JsColor) -> Vec<u8> {
         set_panic_hook();
-        create_package(&self.texture_configs, &color.into())
+        create_texture(&self.image_data, &color.into())
             .unwrap_throw()
     }
 }
