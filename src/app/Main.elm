@@ -7,7 +7,7 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Picker as Picker
+import Picker
 import Random
 
 
