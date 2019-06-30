@@ -4,7 +4,7 @@ import Basics
 import Color exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
-import Picker.Styles exposing (styles)
+import Picker.Shared exposing (slider, styles)
 import Slider
 
 
@@ -81,16 +81,11 @@ view color (Model model) =
             HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
         viewThumb =
-            div [ styles.class .thumb ]
-                [ div [ style "backgroundColor" thumbBackground ]
-                    []
-                ]
+            div [ style "backgroundColor" thumbBackground ]
+                []
 
         viewBackground =
-            div [ styles.class .hueGradient, styles.class .background ]
+            div [ styles.class .hueGradient ]
                 []
     in
-    div [ styles.class .slider ]
-        [ Slider.view viewThumb viewBackground relativePosition model
-        ]
-        |> Html.map Msg
+    slider Msg viewThumb viewBackground relativePosition model

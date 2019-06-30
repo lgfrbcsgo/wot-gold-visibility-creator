@@ -5,7 +5,7 @@ import Html exposing (Html, div)
 import Picker.Alpha as Alpha
 import Picker.Hue as Hue
 import Picker.SaturationValue as SaturationValue
-import Picker.Styles exposing (styles)
+import Picker.Shared exposing (styles)
 
 
 type alias Model =

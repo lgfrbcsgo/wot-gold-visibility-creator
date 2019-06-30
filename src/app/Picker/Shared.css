@@ -4,12 +4,12 @@
     flex-flow: column;
 }
 
-.picker .slider {
+.slider {
     flex: 0 1 auto;
     height: 0.5rem;
 }
 
-.picker .matrix {
+.matrix {
     flex: 1 1 auto;
 }
 
@@ -58,8 +58,4 @@
 
 .hue-gradient {
     background: linear-gradient(to right, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%, 50%), hsl(300, 100%, 50%), hsl(360, 100%, 50%))
-}
-
-.black-gradient {
-    background: linear-gradient(to top, black, transparent);
 }

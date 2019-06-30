@@ -4,7 +4,7 @@ import Basics
 import Color exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
-import Picker.Styles exposing (styles)
+import Picker.Shared exposing (matrix, styles)
 import Slider
 
 
@@ -78,26 +78,17 @@ view color (Model model) =
             HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
         gradient =
-            "linear-gradient(to right, white, " ++ gradientColor ++ ")"
+            "linear-gradient(to top, black, transparent), linear-gradient(to right, white, transparent), " ++ gradientColor
 
         thumbBackgroundColor =
             HsvaRecord hue saturation value 1 |> hsva |> hsvaToRgba |> rgbaToCss
 
         viewThumb =
-            div [ styles.class .thumb ]
-                [ div [ style "backgroundColor" thumbBackgroundColor ]
-                    []
-                ]
+            div [ style "backgroundColor" thumbBackgroundColor ]
+                []
 
         viewBackground =
-            div [ styles.class .background ]
-                [ div [ style "background" gradient ]
-                    [ div [ styles.class .blackGradient ]
-                        []
-                    ]
-                ]
+            div [ style "background" gradient ]
+                []
     in
-    div [ styles.class .matrix ]
-        [ Slider.view viewThumb viewBackground relativePosition model
-        ]
-        |> Html.map Msg
+    matrix Msg viewThumb viewBackground relativePosition model

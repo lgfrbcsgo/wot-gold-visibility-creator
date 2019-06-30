@@ -4,7 +4,7 @@ import Basics
 import Color exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
-import Picker.Styles exposing (styles)
+import Picker.Shared exposing (slider, styles)
 import Slider
 
 
@@ -81,22 +81,15 @@ view color (Model model) =
             "linear-gradient(to right, transparent, " ++ gradientColor ++ ")"
 
         viewThumb =
-            div [ styles.class .thumb ]
-                [ div [ styles.class .checkerboard ]
-                    [ div [ style "backgroundColor" (color |> hsvaToRgba |> rgbaToCss) ]
-                        []
-                    ]
+            div [ styles.class .checkerboard ]
+                [ div [ style "backgroundColor" (color |> hsvaToRgba |> rgbaToCss) ]
+                    []
                 ]
 
         viewBackground =
-            div [ styles.class .background ]
-                [ div [ styles.class .checkerboard ]
-                    [ div [ style "background" gradient ]
-                        []
-                    ]
+            div [ styles.class .checkerboard ]
+                [ div [ style "background" gradient ]
+                    []
                 ]
     in
-    div [ styles.class .slider ]
-        [ Slider.view viewThumb viewBackground relativePosition model
-        ]
-        |> Html.map Msg
+    slider Msg viewThumb viewBackground relativePosition model
