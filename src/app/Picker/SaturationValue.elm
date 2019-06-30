@@ -4,7 +4,7 @@ import Basics
 import Color exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
-import Picker.Shared exposing (matrix, styles)
+import Picker.Shared exposing (matrix)
 import Slider
 
 
@@ -32,23 +32,39 @@ type Msg
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
 update (Msg msg) color (Model model) =
     let
-        { hue, saturation, value, alpha } =
-            fromHsva color
-
         relativePosition =
-            saturationValueToRelativePosition saturation value
+            colorToRelativePosition color
 
         ( updatedRelativePosition, updatedModel ) =
             Slider.update msg relativePosition model
 
         updatedColor =
-            HsvaRecord hue updatedRelativePosition.x (1 - updatedRelativePosition.y) alpha |> hsva
+            updateColor color updatedRelativePosition
     in
     ( updatedColor, Model updatedModel )
 
 
-saturationValueToRelativePosition : Float -> Float -> Slider.Position
-saturationValueToRelativePosition saturation value =
+updateColor : Hsva -> Slider.Position -> Hsva
+updateColor color relativePosition =
+    let
+        { hue, alpha } =
+            fromHsva color
+
+        updatedSaturation =
+            relativePosition.x
+
+        updatedValue =
+            1 - relativePosition.y
+    in
+    HsvaRecord hue updatedSaturation updatedValue alpha |> hsva
+
+
+colorToRelativePosition : Hsva -> Slider.Position
+colorToRelativePosition color =
+    let
+        { saturation, value } =
+            fromHsva color
+    in
     Slider.Position saturation (1 - value)
 
 
@@ -72,7 +88,7 @@ view color (Model model) =
             fromHsva color
 
         relativePosition =
-            saturationValueToRelativePosition saturation value
+            colorToRelativePosition color
 
         gradientColor =
             HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss

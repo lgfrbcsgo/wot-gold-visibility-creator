@@ -32,26 +32,36 @@ type Msg
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
 update (Msg msg) color (Model model) =
     let
-        { hue, saturation, value, alpha } =
-            fromHsva color
-
         relativePosition =
-            hueToRelativePosition hue
+            colorToRelativePosition color
 
         ( updatedRelativePosition, updatedModel ) =
             Slider.update msg relativePosition model
 
-        updatedHue =
-            floor (updatedRelativePosition.x * 360)
-
         updatedColor =
-            HsvaRecord updatedHue saturation value alpha |> hsva
+            updateColor color updatedRelativePosition
     in
     ( updatedColor, Model updatedModel )
 
 
-hueToRelativePosition : Int -> Slider.Position
-hueToRelativePosition hue =
+updateColor : Hsva -> Slider.Position -> Hsva
+updateColor color relativePosition =
+    let
+        { saturation, value, alpha } =
+            fromHsva color
+
+        updatedHue =
+            floor (relativePosition.x * 360)
+    in
+    HsvaRecord updatedHue saturation value alpha |> hsva
+
+
+colorToRelativePosition : Hsva -> Slider.Position
+colorToRelativePosition color =
+    let
+        { hue } =
+            fromHsva color
+    in
     Slider.Position (toFloat hue / 360) 0.5
 
 
@@ -75,7 +85,7 @@ view color (Model model) =
             fromHsva color
 
         relativePosition =
-            hueToRelativePosition hue
+            colorToRelativePosition color
 
         thumbBackground =
             HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss

@@ -32,23 +32,36 @@ type Msg
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
 update (Msg msg) color (Model model) =
     let
-        { hue, saturation, value, alpha } =
-            fromHsva color
-
         relativePosition =
-            alphaToRelativePosition alpha
+            colorToRelativePosition color
 
         ( updatedRelativePosition, updatedModel ) =
             Slider.update msg relativePosition model
 
         updatedColor =
-            HsvaRecord hue saturation value updatedRelativePosition.x |> hsva
+            updateColor color updatedRelativePosition
     in
     ( updatedColor, Model updatedModel )
 
 
-alphaToRelativePosition : Float -> Slider.Position
-alphaToRelativePosition alpha =
+updateColor : Hsva -> Slider.Position -> Hsva
+updateColor color relativePosition =
+    let
+        { hue, saturation, value } =
+            fromHsva color
+
+        updatedAlpha =
+            relativePosition.x
+    in
+    HsvaRecord hue saturation value updatedAlpha |> hsva
+
+
+colorToRelativePosition : Hsva -> Slider.Position
+colorToRelativePosition color =
+    let
+        { alpha } =
+            fromHsva color
+    in
     Slider.Position alpha 0.5
 
 
@@ -68,11 +81,11 @@ subscriptions (Model model) =
 view : Hsva -> Model -> Html Msg
 view color (Model model) =
     let
-        { hue, saturation, value, alpha } =
+        { hue, saturation, value } =
             fromHsva color
 
         relativePosition =
-            alphaToRelativePosition alpha
+            colorToRelativePosition color
 
         gradientColor =
             HsvaRecord hue saturation value 1 |> hsva |> hsvaToRgba |> rgbaToCss
