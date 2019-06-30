@@ -26,11 +26,11 @@ init =
 
 
 type Msg
-    = Msg Slider.Msg
+    = Slider Slider.Msg
 
 
 update : Msg -> Hsva -> Model -> ( Hsva, Model )
-update (Msg msg) color (Model model) =
+update (Slider msg) color (Model model) =
     let
         relativePosition =
             colorToRelativePosition color
@@ -74,7 +74,7 @@ colorToRelativePosition color =
 
 subscriptions : Model -> Sub Msg
 subscriptions (Model model) =
-    Slider.subscriptions model |> Sub.map Msg
+    Slider.subscriptions model |> Sub.map Slider
 
 
 
@@ -107,4 +107,4 @@ view color (Model model) =
             div [ style "background" gradient ]
                 []
     in
-    matrix Msg viewThumb viewBackground relativePosition model
+    matrix Slider viewThumb viewBackground relativePosition model
