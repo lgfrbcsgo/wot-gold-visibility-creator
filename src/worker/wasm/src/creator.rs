@@ -2,7 +2,7 @@ use std::io::{Write, Cursor};
 use std::borrow::Cow;
 use ddsfile::{Dds, D3DFormat};
 use image::dxt::{DXTEncoder, DXTVariant};
-use zip::{ZipWriter, CompressionMethod};
+use zip::{ZipWriter, CompressionMethod, DateTime};
 use zip::write::FileOptions;
 
 
@@ -22,6 +22,7 @@ pub mod errors {
     }
 }
 use errors::CreateResult;
+use wasm_bindgen::UnwrapThrowExt;
 
 
 pub struct Color {
@@ -57,12 +58,15 @@ pub fn create_package(texture_configs: &Vec<TextureConfig>, color: &Color) -> Cr
     let cursor = Cursor::new(buffer);
     let mut zip = ZipWriter::new(cursor);
 
-    let zip_options = FileOptions::default().compression_method(CompressionMethod::Stored);
+    let zip_options = FileOptions::default()
+        .compression_method(CompressionMethod::Stored)
+        .unix_permissions(0o777)
+        .last_modified_time(date());
 
     for TextureConfig { image_data, package_path } in texture_configs {
         let texture = encode_dds(&image_data.map_data(|data| create_texture_data(color, data)))?;
         zip.start_file(Cow::from(package_path), zip_options)?;
-        zip.write(&texture)?;
+        zip.write_all(&texture)?;
     }
 
     let cursor = zip.finish()?;
@@ -98,4 +102,8 @@ fn encode_dds(image_data: &ImageData) -> CreateResult<Vec<u8>> {
     dds.write(&mut output)?;
 
     Ok(output)
+}
+
+fn date() -> DateTime {
+    DateTime::from_date_and_time(2017, 1, 1, 0, 0, 0).unwrap_throw()
 }
