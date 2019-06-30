@@ -150,8 +150,12 @@ view model =
 
     else
         div []
-            [ div [ styles.class .picker ] [ Picker.view model.color model.picker |> map Picker ]
-            , button [ onClick CreateModPackage ] [ text "Run" ]
+            [ div [ styles.class .picker ]
+                [ Picker.view model.color model.picker |> map Picker
+                ]
+            , button [ onClick CreateModPackage ]
+                [ text "Run"
+                ]
             ]
 
 
