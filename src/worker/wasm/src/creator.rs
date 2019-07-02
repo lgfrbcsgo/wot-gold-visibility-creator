@@ -1,8 +1,5 @@
-use std::io::{Write, Cursor};
-use std::borrow::Cow;
 use ddsfile::{Dds, D3DFormat};
 use image::dxt::{DXTEncoder, DXTVariant};
-
 
 pub mod errors {
     error_chain! {
@@ -18,9 +15,8 @@ pub mod errors {
         errors {}
     }
 }
-use errors::CreateResult;
-use wasm_bindgen::UnwrapThrowExt;
 
+use errors::CreateResult;
 
 pub struct Color {
     pub red: u8,

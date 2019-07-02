@@ -1,41 +1,34 @@
-import {wrap, transfer} from 'comlink';
-import {Rgba} from '../types';
-import {TextureConfig, CreatorWorkerInitializer} from './types';
+import {wrap, Remote} from 'comlink';
 import {loadImageData} from './util';
+import {createZipWriter} from './zip';
+import {Creator, TextureConfig} from './types';
+import {Rgba} from '../types';
 import packageConfig from '../../res/worker/package.config.json';
-import {createWriter} from "./zip";
 
-
-const worker = new Worker('./creator', {type: 'module'});
-const initPromise = init();
-
+const config = initConfig();
 
 export async function createModPackage(color: Rgba): Promise<Blob> {
-    // Keep a reference to the worker, otherwise Edge will garbage collect it!
-    // "await" worker to not get optimized away during the build.
-    await worker;
+    const creatorWorker = new Worker('./creator', {type: 'module'});
+    const creator = wrap(creatorWorker) as Remote<Creator>;
 
-    const zipWriter = await createWriter();
-    const config = await initPromise;
-    for (const {packagePath, worker} of config) {
-        const texture = await worker.create(color);
-        await zipWriter.add(packagePath, new Blob([texture]));
+    const zipWriter = await createZipWriter();
+    for (const {packagePath, imageData} of await config) {
+        const textureData = await creator(imageData, color);
+        await zipWriter.add(packagePath, new Blob([textureData]));
     }
 
-    return await zipWriter.close();
+    const blob = await zipWriter.close();
+    creatorWorker.terminate();
+    return blob;
 }
 
-
-async function init() : Promise<TextureConfig[]> {
-    const initializeWorker = wrap<CreatorWorkerInitializer>(worker);
+async function initConfig() : Promise<TextureConfig[]> {
     const textures = packageConfig.textures.map(async ({ src, packagePath }) => {
         const imageUrl = require('../../res/worker/' + src);
-        const imageData = await loadImageData(imageUrl);
-        const textureConfig: TextureConfig = {
+        return {
             packagePath,
-            worker: await initializeWorker(imageData)
+            imageData: await loadImageData(imageUrl)
         };
-        return transfer(textureConfig, [imageData.data.buffer]);
     });
     return await Promise.all(textures);
 }

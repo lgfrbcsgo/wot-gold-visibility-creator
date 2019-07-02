@@ -3,7 +3,6 @@ use wasm_bindgen::prelude::*;
 mod creator;
 use creator::*;
 
-
 #[macro_use]
 extern crate error_chain;
 
@@ -17,7 +16,7 @@ pub fn set_panic_hook() {
 }
 
 
-// JS imports
+// ---- JS imports ----
 
 
 #[wasm_bindgen]
@@ -73,27 +72,12 @@ impl Into<ImageData> for JsImageData {
 }
 
 
-// Rust exports
+// ---- Rust exports ----
 
 
 #[wasm_bindgen]
-struct WasmCreatorWorker {
-    image_data: ImageData
-}
-
-#[wasm_bindgen]
-impl WasmCreatorWorker {
-    #[wasm_bindgen(constructor)]
-    pub fn new(image_data: JsImageData) -> WasmCreatorWorker {
-        set_panic_hook();
-        WasmCreatorWorker {
-            image_data: image_data.into()
-        }
-    }
-
-    pub fn create(&self, color: JsColor) -> Vec<u8> {
-        set_panic_hook();
-        create_texture(&self.image_data, &color.into())
-            .unwrap_throw()
-    }
+pub fn create(image_data: JsImageData, color: JsColor) -> Vec<u8> {
+    set_panic_hook();
+    create_texture(&image_data.into(), &color.into())
+        .unwrap_throw()
 }
