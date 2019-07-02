@@ -1,8 +1,6 @@
-import {Rgba} from "../types";
+import {Rgba} from '../types';
 
-export interface TextureConfig {
-    imageData: ImageData;
-    packagePath: string;
-}
-
+/**
+ * Defines contract between creator worker and main thread.
+ */
 export type Creator = (imageData: ImageData, color: Rgba) => Promise<Uint8Array>

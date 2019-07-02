@@ -1,7 +1,7 @@
-import {wrap, Remote} from 'comlink';
+import {Remote, wrap} from 'comlink';
 import {loadImageData} from './util';
 import {createZipWriter} from './zip';
-import {Creator, TextureConfig} from './types';
+import {Creator} from './types';
 import {Rgba} from '../types';
 import packageConfig from '../../res/worker/package.config.json';
 
@@ -20,6 +20,11 @@ export async function createModPackage(color: Rgba): Promise<Blob> {
     const blob = await zipWriter.close();
     creatorWorker.terminate();
     return blob;
+}
+
+interface TextureConfig {
+    imageData: ImageData;
+    packagePath: string;
 }
 
 async function initConfig() : Promise<TextureConfig[]> {
