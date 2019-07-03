@@ -1,4 +1,4 @@
-import {Remote, wrap} from 'comlink';
+import {wrap} from 'comlink';
 import {loadImageData} from './util';
 import {createZipWriter} from './zip';
 import {Creator} from './types';
@@ -8,18 +8,20 @@ import packageConfig from '../../res/worker/package.config.json';
 const config = initConfig();
 
 export async function createModPackage(color: Rgba): Promise<Blob> {
-    const creatorWorker = new Worker('./creator', {type: 'module'});
-    const creator = wrap(creatorWorker) as Remote<Creator>;
+    const worker = new Worker('./creator', {type: 'module'});
+    try {
+        const creator = wrap<Creator>(worker);
 
-    const zipWriter = await createZipWriter();
-    for (const {packagePath, imageData} of await config) {
-        const textureData = await creator(imageData, color);
-        await zipWriter.add(packagePath, new Blob([textureData]));
+        const zipWriter = await createZipWriter();
+        for (const {packagePath, imageData} of await config) {
+            const textureData = await creator(imageData, color);
+            await zipWriter.add(packagePath, new Blob([textureData]));
+        }
+
+        return await zipWriter.close();
+    } finally {
+        worker.terminate()
     }
-
-    const blob = await zipWriter.close();
-    creatorWorker.terminate();
-    return blob;
 }
 
 interface TextureConfig {
