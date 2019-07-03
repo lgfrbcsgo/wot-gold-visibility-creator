@@ -35,9 +35,9 @@ const createConfig = (inProdMode, inDevMode) => ({
                     {
                         loader: 'elm-css-modules-loader'
                     },
-                    {
+                    ...inDevMode([{
                         loader: 'elm-hot-webpack-loader'
-                    },
+                    }]),
                     {
                         loader: 'elm-webpack-loader',
                         options: {
