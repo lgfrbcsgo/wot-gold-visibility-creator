@@ -14,13 +14,3 @@ export function saveBlob(blob: Blob, fileName: string) {
         });
     }
 }
-
-/**
- * Throws the error inside a setTimout to trigger the global error hook from the context of a Promise
- */
-export function rethrowError(e: Error) {
-    setTimeout(() => {
-        throw e;
-    });
-    return Promise.reject(e);
-}
