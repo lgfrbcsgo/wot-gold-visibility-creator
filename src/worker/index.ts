@@ -11,8 +11,8 @@ export async function createModPackage(color: Rgba): Promise<Blob> {
     const worker = new Worker('./creator', {type: 'module'});
     try {
         const creator = wrap<Creator>(worker);
-
         const zipWriter = await createZipWriter();
+
         for (const {packagePath, imageData} of await config()) {
             const textureData = await creator(imageData, color);
             await zipWriter.add(packagePath, new Blob([textureData]));
@@ -30,12 +30,15 @@ interface TextureConfig {
 }
 
 async function loadConfig() : Promise<TextureConfig[]> {
-    const textures = packageConfig.textures.map(async ({ src, packagePath }) => {
-        const imageUrl = require('../../res/worker/' + src);
-        return {
-            packagePath,
-            imageData: await loadImageData(imageUrl)
-        };
-    });
-    return await Promise.all(textures);
+    const promises = packageConfig.textures
+        .map(async ({ src, packagePath }) => {
+            const imageUrl = require('../../res/worker/' + src);
+
+            return {
+                packagePath,
+                imageData: await loadImageData(imageUrl)
+            };
+        });
+
+    return await Promise.all(promises);
 }
