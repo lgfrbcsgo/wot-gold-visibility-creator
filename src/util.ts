@@ -14,3 +14,13 @@ export function saveBlob(blob: Blob, fileName: string) {
         });
     }
 }
+
+export function rethrow<T, U extends Array<T>, R>(fn: (...args: U) => Promise<R>): (...args: U) => Promise<R> {
+    return (...args: U) => fn(...args)
+        .catch(e => {
+            setTimeout(() => {
+                throw e
+            });
+            throw e;
+        });
+}
