@@ -1,17 +1,3 @@
-export function cache<T>(fn: () => Promise<T>): () => Promise<T> {
-    let cachedPromise: Promise<T> | null;
-
-    return async () => {
-        cachedPromise = cachedPromise || fn();
-        try {
-            return await cachedPromise;
-        } catch (e) {
-            cachedPromise = null;
-            throw e;
-        }
-    }
-}
-
 export async function loadImageData(url: string): Promise<ImageData> {
     const image = await loadImage(url);
 

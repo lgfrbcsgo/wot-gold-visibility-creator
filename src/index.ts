@@ -1,5 +1,6 @@
 import {Elm} from './app/Main';
-import {rethrow, saveBlob} from "./util";
+import {rethrow, saveBlob} from './util';
+import './polyfills';
 
 const app = Elm.Main.init({
     node: document.getElementById('app')

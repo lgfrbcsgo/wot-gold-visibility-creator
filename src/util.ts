@@ -24,3 +24,17 @@ export function rethrow<T, U extends Array<T>, R>(fn: (...args: U) => Promise<R>
             throw e;
         });
 }
+
+export function cache<T>(fn: () => Promise<T>): () => Promise<T> {
+    let cachedPromise: Promise<T> | null;
+
+    return async () => {
+        cachedPromise = cachedPromise || fn();
+        try {
+            return await cachedPromise;
+        } catch (e) {
+            cachedPromise = null;
+            throw e;
+        }
+    }
+}
