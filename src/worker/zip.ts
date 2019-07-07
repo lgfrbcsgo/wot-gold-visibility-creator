@@ -10,7 +10,7 @@ export interface ZipEntry {
     content: Blob;
 }
 
-export async function zipFile(files: AsyncIterableIterator<ZipEntry>): Promise<Blob> {
+export async function createZipFile(files: AsyncIterableIterator<ZipEntry>): Promise<Blob> {
     const zipWriter = await createZipWriter();
     try {
         for await (const {path, content} of files) {
