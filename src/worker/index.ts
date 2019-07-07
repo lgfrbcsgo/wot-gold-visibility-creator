@@ -39,7 +39,7 @@ async function* generateZipEntries(creator: Remote<Creator>, color: Rgba) {
 function* generateCreatorWorkerIds() {
     let sequenceNumber = 0;
     while (true) {
-        yield 'creatorWorker_' + sequenceNumber;
+        yield 'creatorWorker' + sequenceNumber;
         sequenceNumber++;
     }
 }
