@@ -1,6 +1,6 @@
 import {expose, transfer} from 'comlink';
 import {Creator} from './types';
-import {polyfillTextEncoder} from "../polyfills";
+import {polyfillTextEncoder} from '../polyfills';
 
 const create: Creator = async (imageData, color) => {
     await polyfillTextEncoder();

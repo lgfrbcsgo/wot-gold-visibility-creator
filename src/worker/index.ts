@@ -6,26 +6,25 @@ import {cache} from "../util";
 import {Rgba} from '../types';
 import packageConfig from '../../res/worker/package.config.json';
 
-const loadConfig = cache(() => Promise.all(
-    packageConfig.textures
-        .map(async ({ src, path }) => {
-            const imageUrl = require('../../res/worker/' + src);
+const creatorWorkerIds = generateCreatorWorkerIds();
 
-            return {
-                path,
-                imageData: await loadImageData(imageUrl)
-            };
-        }))
-);
+const loadConfig = cache(() => Promise.all(
+    packageConfig.textures.map(loadTextureConfig)
+));
 
 export async function createModPackage(color: Rgba): Promise<Blob> {
-    const worker = new Worker('./creator', {type: 'module'});
+    const workerId = creatorWorkerIds.next().value;
+
+    // Save worker to window object. Otherwise Edge and Safari will destroy the worker thread.
+    self[workerId] = new Worker('./creator', {type: 'module'});
+
     try {
-        const creator = wrap<Creator>(worker);
+        const creator = wrap<Creator>(self[workerId]);
         const zipEntries = generateZipEntries(creator, color);
         return await createZipFile(zipEntries);
     } finally {
-        worker.terminate()
+        self[workerId].terminate();
+        delete self[workerId];
     }
 }
 
@@ -35,4 +34,20 @@ async function* generateZipEntries(creator: Remote<Creator>, color: Rgba) {
         const content = new Blob([textureData]);
         yield {path, content};
     }
+}
+
+function* generateCreatorWorkerIds() {
+    let sequenceNumber = 0;
+    while (true) {
+        yield 'creatorWorker_' + sequenceNumber;
+        sequenceNumber++;
+    }
+}
+
+async function loadTextureConfig({src, path}: {src: string, path: string}) {
+    const imageUrl = require('../../res/worker/' + src);
+    return {
+        path,
+        imageData: await loadImageData(imageUrl)
+    };
 }
