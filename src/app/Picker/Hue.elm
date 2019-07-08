@@ -47,20 +47,17 @@ update (Slider msg) color (Model model) =
 updateColor : Hsva -> Slider.Position -> Hsva
 updateColor color relativePosition =
     let
-        { saturation, value, alpha } =
-            fromHsva color
-
         updatedHue =
             floor (relativePosition.x * 360)
     in
-    HsvaRecord updatedHue saturation value alpha |> hsva
+    color |> mapHue updatedHue
 
 
 colorToRelativePosition : Hsva -> Slider.Position
 colorToRelativePosition color =
     let
         { hue } =
-            fromHsva color
+            color |> toHsva
     in
     Slider.Position (toFloat hue / 360) 0.5
 
@@ -81,14 +78,15 @@ subscriptions (Model model) =
 view : Hsva -> Model -> Html Msg
 view color (Model model) =
     let
-        { hue } =
-            fromHsva color
-
         relativePosition =
             colorToRelativePosition color
 
         thumbBackground =
-            HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss
+            color
+                |> mapSaturation 1
+                |> mapValue 1
+                |> mapAlpha 1
+                |> toCss
 
         viewThumb =
             div [ style "backgroundColor" thumbBackground ]

@@ -1,16 +1,35 @@
 module Color exposing
-    ( Hsva
+    ( Color
+    , Hsva
     , HsvaRecord
     , Rgba
     , RgbaRecord
-    , fromHsva
-    , fromRgba
     , hsva
-    , hsvaToRgba
+    , mapAlpha
+    , mapBlue
+    , mapGreen
+    , mapHue
+    , mapRed
+    , mapSaturation
+    , mapValue
     , rgba
-    , rgbaToCss
-    , rgbaToHsva
+    , toCss
+    , toHsva
+    , toRgba
     )
+
+
+type alias Hsva =
+    Color HsvaRecord
+
+
+type alias Rgba =
+    Color RgbaRecord
+
+
+type Color a
+    = Rgba RgbaRecord
+    | Hsva HsvaRecord
 
 
 type alias RgbaRecord =
@@ -29,16 +48,18 @@ type alias HsvaRecord =
     }
 
 
-type Rgba
-    = Rgba RgbaRecord
+rgba : Int -> Int -> Int -> Float -> Rgba
+rgba =
+    constructRgba
 
 
-type Hsva
-    = Hsva HsvaRecord
+hsva : Int -> Float -> Float -> Float -> Hsva
+hsva =
+    constructHsva
 
 
-rgba : RgbaRecord -> Rgba
-rgba { red, green, blue, alpha } =
+constructRgba : Int -> Int -> Int -> Float -> Color a
+constructRgba red green blue alpha =
     Rgba
         { red = red |> min 255 |> max 0
         , green = green |> min 255 |> max 0
@@ -47,13 +68,8 @@ rgba { red, green, blue, alpha } =
         }
 
 
-fromRgba : Rgba -> RgbaRecord
-fromRgba (Rgba record) =
-    record
-
-
-hsva : HsvaRecord -> Hsva
-hsva { hue, saturation, value, alpha } =
+constructHsva : Int -> Float -> Float -> Float -> Color a
+constructHsva hue saturation value alpha =
     Hsva
         { hue = hue
         , saturation = saturation |> min 1.0 |> max 0.0
@@ -62,13 +78,8 @@ hsva { hue, saturation, value, alpha } =
         }
 
 
-fromHsva : Hsva -> HsvaRecord
-fromHsva (Hsva record) =
-    record
-
-
-rgbaToHsva : Rgba -> Hsva
-rgbaToHsva (Rgba { red, green, blue, alpha }) =
+rgbaToHsva : RgbaRecord -> HsvaRecord
+rgbaToHsva { red, green, blue, alpha } =
     let
         r =
             toFloat red / 255
@@ -108,11 +119,15 @@ rgbaToHsva (Rgba { red, green, blue, alpha }) =
             else
                 c / cMax
     in
-    Hsva (HsvaRecord (round h) s cMax alpha)
+    { hue = round h
+    , saturation = s
+    , value = cMax
+    , alpha = alpha
+    }
 
 
-hsvaToRgba : Hsva -> Rgba
-hsvaToRgba (Hsva { hue, saturation, value, alpha }) =
+hsvaToRgba : HsvaRecord -> RgbaRecord
+hsvaToRgba { hue, saturation, value, alpha } =
     let
         h =
             modBy 360 hue
@@ -145,17 +160,39 @@ hsvaToRgba (Hsva { hue, saturation, value, alpha }) =
             else
                 ( c, 0, x )
     in
-    Rgba
-        (RgbaRecord
-            (round ((r + m) * 255))
-            (round ((g + m) * 255))
-            (round ((b + m) * 255))
-            alpha
-        )
+    { red = round ((r + m) * 255)
+    , green = round ((g + m) * 255)
+    , blue = round ((b + m) * 255)
+    , alpha = alpha
+    }
 
 
-rgbaToCss : Rgba -> String
-rgbaToCss (Rgba { red, green, blue, alpha }) =
+toHsva : Color a -> HsvaRecord
+toHsva color =
+    case color of
+        Hsva hsvaRecord ->
+            hsvaRecord
+
+        Rgba rgbaRecord ->
+            rgbaToHsva rgbaRecord
+
+
+toRgba : Color a -> RgbaRecord
+toRgba color =
+    case color of
+        Hsva hsvaRecord ->
+            hsvaToRgba hsvaRecord
+
+        Rgba rgbaRecord ->
+            rgbaRecord
+
+
+toCss : Color a -> String
+toCss color =
+    let
+        { red, green, blue, alpha } =
+            toRgba color
+    in
     "rgba("
         ++ String.fromInt red
         ++ ","
@@ -165,6 +202,76 @@ rgbaToCss (Rgba { red, green, blue, alpha }) =
         ++ ","
         ++ String.fromFloat alpha
         ++ ")"
+
+
+mapRed : Int -> Color { a | red : Int } -> Color { a | red : Int }
+mapRed red color =
+    case color of
+        Rgba { green, blue, alpha } ->
+            constructRgba red green blue alpha
+
+        _ ->
+            color
+
+
+mapGreen : Int -> Color { a | green : Int } -> Color { a | green : Int }
+mapGreen green color =
+    case color of
+        Rgba { red, blue, alpha } ->
+            constructRgba red green blue alpha
+
+        _ ->
+            color
+
+
+mapBlue : Int -> Color { a | blue : Int } -> Color { a | blue : Int }
+mapBlue blue color =
+    case color of
+        Rgba { red, green, alpha } ->
+            constructRgba red green blue alpha
+
+        _ ->
+            color
+
+
+mapHue : Int -> Color { a | hue : Int } -> Color { a | hue : Int }
+mapHue hue color =
+    case color of
+        Hsva { saturation, value, alpha } ->
+            constructHsva hue saturation value alpha
+
+        _ ->
+            color
+
+
+mapSaturation : Float -> Color { a | saturation : Float } -> Color { a | saturation : Float }
+mapSaturation saturation color =
+    case color of
+        Hsva { hue, value, alpha } ->
+            constructHsva hue saturation value alpha
+
+        _ ->
+            color
+
+
+mapValue : Float -> Color { a | value : Float } -> Color { a | value : Float }
+mapValue value color =
+    case color of
+        Hsva { hue, saturation, alpha } ->
+            constructHsva hue saturation value alpha
+
+        _ ->
+            color
+
+
+mapAlpha : Float -> Color { a | alpha : Float } -> Color { a | alpha : Float }
+mapAlpha alpha color =
+    case color of
+        Hsva { hue, saturation, value } ->
+            constructHsva hue saturation value alpha
+
+        Rgba { red, green, blue } ->
+            constructRgba red green blue alpha
 
 
 fModBy : Float -> Int -> Float

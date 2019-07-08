@@ -36,19 +36,18 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model (hsva (HsvaRecord 360 1 1 1)) Picker.init False
+    ( Model (hsva 360 1 1 1) Picker.init False
     , Random.generate RandomColor randomColor
     )
 
 
 randomColor : Random.Generator Hsva
 randomColor =
-    Random.map hsva <|
-        Random.map4 HsvaRecord
-            (Random.int 0 360)
-            (Random.float 0.5 1)
-            (Random.float 0.65 1)
-            (Random.float 1 1)
+    Random.map4 hsva
+        (Random.int 0 360)
+        (Random.float 0.5 1)
+        (Random.float 0.65 1)
+        (Random.float 1 1)
 
 
 
@@ -98,16 +97,16 @@ update msg model =
             )
 
 
-createModPackage : Hsva -> Cmd msg
+createModPackage : Color a -> Cmd msg
 createModPackage =
-    hsvaToRgba >> encodeRgba >> startWorker
+    encodeRgba >> startWorker
 
 
-encodeRgba : Rgba -> Encode.Value
+encodeRgba : Color a -> Encode.Value
 encodeRgba color =
     let
         { red, green, blue, alpha } =
-            fromRgba color
+            color |> toRgba
     in
     Encode.object
         [ ( "red", Encode.int red )

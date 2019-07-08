@@ -47,23 +47,22 @@ update (Slider msg) color (Model model) =
 updateColor : Hsva -> Slider.Position -> Hsva
 updateColor color relativePosition =
     let
-        { hue, alpha } =
-            fromHsva color
-
         updatedSaturation =
             relativePosition.x
 
         updatedValue =
             1 - relativePosition.y
     in
-    HsvaRecord hue updatedSaturation updatedValue alpha |> hsva
+    color
+        |> mapSaturation updatedSaturation
+        |> mapValue updatedValue
 
 
 colorToRelativePosition : Hsva -> Slider.Position
 colorToRelativePosition color =
     let
         { saturation, value } =
-            fromHsva color
+            color |> toHsva
     in
     Slider.Position saturation (1 - value)
 
@@ -84,20 +83,21 @@ subscriptions (Model model) =
 view : Hsva -> Model -> Html Msg
 view color (Model model) =
     let
-        { hue, saturation, value } =
-            fromHsva color
-
         relativePosition =
             colorToRelativePosition color
 
         gradientColor =
-            HsvaRecord hue 1 1 1 |> hsva |> hsvaToRgba |> rgbaToCss
+            color
+                |> mapSaturation 1
+                |> mapValue 1
+                |> mapAlpha 1
+                |> toCss
 
         gradient =
             "linear-gradient(to top, black, transparent), linear-gradient(to right, white, transparent), " ++ gradientColor
 
         thumbBackgroundColor =
-            HsvaRecord hue saturation value 1 |> hsva |> hsvaToRgba |> rgbaToCss
+            color |> mapAlpha 1 |> toCss
 
         viewThumb =
             div [ style "backgroundColor" thumbBackgroundColor ]
