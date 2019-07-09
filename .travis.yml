@@ -7,7 +7,9 @@ cache:
   - npm
 
 before_install:
-  - cargo install wasm-pack --version 0.8.1
+  # only install wasm-pack if we haven't cached it already
+  - '[ "${wasm-pack -V}" == "wasm-pack 0.8.1" ] || cargo install wasm-pack --version 0.8.1 --force'
+
   - nvm install 10.15.3
   - nvm use 10.15.3
   - npm install -g elm@0.19.0-no-deps
