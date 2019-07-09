@@ -14,9 +14,14 @@ type alias Hsv =
     { hue : Int, saturation : Float, value : Float }
 
 
-maxRoundingError : Float
+maxRoundingError : FloatingPointTolerance
 maxRoundingError =
-    0.002
+    Absolute 1
+
+
+noRoundingError : FloatingPointTolerance
+noRoundingError =
+    Absolute 0
 
 
 validValue : Fuzzer Float
@@ -45,20 +50,20 @@ conversion name { hue, saturation, value } { red, green, blue } =
                 Color.hsva hueFloat saturation value alpha
                     |> Color.toRgba
                     |> Expect.all
-                        [ .red >> Expect.within (Absolute maxRoundingError) redFloat
-                        , .green >> Expect.within (Absolute maxRoundingError) greenFloat
-                        , .blue >> Expect.within (Absolute maxRoundingError) blueFloat
-                        , .alpha >> Expect.within (Absolute 0) alpha
+                        [ .red >> Expect.within maxRoundingError redFloat
+                        , .green >> Expect.within maxRoundingError greenFloat
+                        , .blue >> Expect.within maxRoundingError blueFloat
+                        , .alpha >> Expect.within noRoundingError alpha
                         ]
         , fuzz validValue "from Rgba to Hsva." <|
             \alpha ->
                 Color.rgba redFloat greenFloat blueFloat alpha
                     |> Color.toHsva
                     |> Expect.all
-                        [ .hue >> Expect.within (Absolute maxRoundingError) hueFloat
-                        , .saturation >> Expect.within (Absolute maxRoundingError) saturation
-                        , .value >> Expect.within (Absolute maxRoundingError) value
-                        , .alpha >> Expect.within (Absolute 0) alpha
+                        [ .hue >> Expect.within maxRoundingError hueFloat
+                        , .saturation >> Expect.within maxRoundingError saturation
+                        , .value >> Expect.within maxRoundingError value
+                        , .alpha >> Expect.within noRoundingError alpha
                         ]
         , fuzz validValue "from Hsva to Hsva." <|
             \alpha ->
@@ -115,5 +120,22 @@ conversions =
                         , .green >> Expect.atMost 1
                         , .blue >> Expect.atLeast 0
                         , .blue >> Expect.atMost 1
+                        ]
+        , fuzz3 validValue validValue validValue "Conversion from Rgba to Rgba via Hsva has no effect." <|
+            let
+                hsvaRecordToHsva =
+                    \{ hue, saturation, value, alpha } ->
+                        Color.hsva hue saturation value alpha
+            in
+            \red green blue ->
+                Color.rgba red green blue 1
+                    |> Color.toHsva
+                    |> hsvaRecordToHsva
+                    |> Color.toRgba
+                    |> Expect.all
+                        [ .red >> Expect.within maxRoundingError red
+                        , .green >> Expect.within maxRoundingError green
+                        , .blue >> Expect.within maxRoundingError blue
+                        , .alpha >> Expect.within noRoundingError 1
                         ]
         ]
