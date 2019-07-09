@@ -14,13 +14,16 @@ before_install:
   - nvm use 10.15.3
   - npm install -g elm@0.19.0-no-deps
   - npm install -g elm-test@0.19.0-rev6
+  - npm install -g elm-format@0.8.1
 
 install:
   - npm install
 
 script:
-  - npm run build
+  - elm-format . --validate
   - elm-test
+  - npm run build
+
 
 deploy:
   provider: pages
