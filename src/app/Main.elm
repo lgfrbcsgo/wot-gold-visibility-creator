@@ -44,7 +44,7 @@ init _ =
 randomColor : Random.Generator Hsva
 randomColor =
     Random.map4 hsva
-        (Random.int 0 360)
+        (Random.float 0 1)
         (Random.float 0.5 1)
         (Random.float 0.65 1)
         (Random.float 1 1)
@@ -109,10 +109,10 @@ encodeRgba color =
             color |> toRgba
     in
     Encode.object
-        [ ( "red", Encode.int red )
-        , ( "green", Encode.int green )
-        , ( "blue", Encode.int blue )
-        , ( "alpha", Encode.float alpha )
+        [ ( "red", red * 255 |> round |> Encode.int )
+        , ( "green", green * 255 |> round |> Encode.int )
+        , ( "blue", blue * 255 |> round |> Encode.int )
+        , ( "alpha", alpha |> Encode.float )
         ]
 
 

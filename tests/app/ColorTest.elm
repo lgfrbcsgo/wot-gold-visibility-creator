@@ -19,34 +19,57 @@ maxRoundingError =
     0.002
 
 
+validValue : Fuzzer Float
+validValue =
+    floatRange 0 1
+
+
 conversion : String -> Hsv -> Rgb -> Test
 conversion name { hue, saturation, value } { red, green, blue } =
+    let
+        hueFloat =
+            toFloat hue / 360
+
+        redFloat =
+            toFloat red / 255
+
+        greenFloat =
+            toFloat green / 255
+
+        blueFloat =
+            toFloat blue / 255
+    in
     describe ("Converts " ++ name)
-        [ fuzz (floatRange 0 1) "from Hsva to Rgba" <|
+        [ fuzz validValue "from Hsva to Rgba." <|
             \alpha ->
-                Color.hsva hue saturation value alpha
+                Color.hsva hueFloat saturation value alpha
                     |> Color.toRgba
-                    |> Expect.equal (Color.RgbaRecord red green blue alpha)
-        , fuzz (floatRange 0 1) "from Rgba to Hsva" <|
+                    |> Expect.all
+                        [ .red >> Expect.within (Absolute maxRoundingError) redFloat
+                        , .green >> Expect.within (Absolute maxRoundingError) greenFloat
+                        , .blue >> Expect.within (Absolute maxRoundingError) blueFloat
+                        , .alpha >> Expect.within (Absolute 0) alpha
+                        ]
+        , fuzz validValue "from Rgba to Hsva." <|
             \alpha ->
-                Color.rgba red green blue alpha
+                Color.rgba redFloat greenFloat blueFloat alpha
                     |> Color.toHsva
                     |> Expect.all
-                        [ .hue >> Expect.equal hue
+                        [ .hue >> Expect.within (Absolute maxRoundingError) hueFloat
                         , .saturation >> Expect.within (Absolute maxRoundingError) saturation
                         , .value >> Expect.within (Absolute maxRoundingError) value
                         , .alpha >> Expect.within (Absolute 0) alpha
                         ]
-        , fuzz (floatRange 0 1) "from Hsva to Hsva" <|
+        , fuzz validValue "from Hsva to Hsva." <|
             \alpha ->
-                Color.hsva hue saturation value alpha
+                Color.hsva hueFloat saturation value alpha
                     |> Color.toHsva
-                    |> Expect.equal (Color.HsvaRecord hue saturation value alpha)
-        , fuzz (floatRange 0 1) "from Rgba to Rgba" <|
+                    |> Expect.equal (Color.HsvaRecord hueFloat saturation value alpha)
+        , fuzz validValue "from Rgba to Rgba." <|
             \alpha ->
-                Color.rgba red green blue alpha
+                Color.rgba redFloat greenFloat blueFloat alpha
                     |> Color.toRgba
-                    |> Expect.equal (Color.RgbaRecord red green blue alpha)
+                    |> Expect.equal (Color.RgbaRecord redFloat greenFloat blueFloat alpha)
         ]
 
 
@@ -69,4 +92,28 @@ conversions =
         , conversion "Purple" (Hsv 300 1 0.5) (Rgb 128 0 128)
         , conversion "Teal" (Hsv 180 1 0.5) (Rgb 0 128 128)
         , conversion "Navy" (Hsv 240 1 0.5) (Rgb 0 0 128)
+        , fuzz3 validValue validValue validValue "Conversion from Rgba to Hsva is within valid range." <|
+            \red green blue ->
+                Color.rgba red green blue 1
+                    |> Color.toHsva
+                    |> Expect.all
+                        [ .hue >> Expect.atLeast 0
+                        , .hue >> Expect.atMost 1
+                        , .saturation >> Expect.atLeast 0
+                        , .saturation >> Expect.atMost 1
+                        , .value >> Expect.atLeast 0
+                        , .value >> Expect.atMost 1
+                        ]
+        , fuzz3 validValue validValue validValue "Conversion from Hsva to Rgba is within valid range." <|
+            \hue saturation value ->
+                Color.hsva hue saturation value 1
+                    |> Color.toRgba
+                    |> Expect.all
+                        [ .red >> Expect.atLeast 0
+                        , .red >> Expect.atMost 1
+                        , .green >> Expect.atLeast 0
+                        , .green >> Expect.atMost 1
+                        , .blue >> Expect.atLeast 0
+                        , .blue >> Expect.atMost 1
+                        ]
         ]

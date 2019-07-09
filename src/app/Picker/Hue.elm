@@ -48,7 +48,7 @@ updateColor : Hsva -> Slider.Position -> Hsva
 updateColor color relativePosition =
     let
         updatedHue =
-            floor (relativePosition.x * 360)
+            relativePosition.x
     in
     color |> mapHue updatedHue
 
@@ -59,7 +59,7 @@ colorToRelativePosition color =
         { hue } =
             color |> toHsva
     in
-    Slider.Position (toFloat hue / 360) 0.5
+    Slider.Position hue 0.5
 
 
 
