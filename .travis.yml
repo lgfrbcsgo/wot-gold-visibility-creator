@@ -19,9 +19,9 @@ install:
   - cargo fetch --manifest-path src/worker/wasm/Cargo.toml --locked
 
 script:
-  - elm-format . --validate
-  - elm-test
   - npm run build
+  - elm-test
+  - elm-format . --validate
 
 
 deploy:
