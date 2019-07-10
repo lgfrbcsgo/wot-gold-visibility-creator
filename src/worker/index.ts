@@ -6,14 +6,12 @@ import {cache} from "../util";
 import {Rgba} from '../types';
 import packageConfig from '../../res/worker/package.config.json';
 
-const creatorWorkerIds = generateCreatorWorkerIds();
-
 const loadConfig = cache(() => Promise.all(
     packageConfig.textures.map(loadTextureConfig)
 ));
 
 export async function createModPackage(color: Rgba): Promise<Blob> {
-    const workerId = creatorWorkerIds.next().value;
+    const workerId = generateWorkerId();
 
     // Save worker to window object. Otherwise Edge and Safari will destroy the worker thread.
     self[workerId] = new Worker('./texture', {type: 'module'});
@@ -36,12 +34,8 @@ async function* generateZipEntries(creator: Remote<TextureCreator>, color: Rgba)
     }
 }
 
-function* generateCreatorWorkerIds() {
-    let sequenceNumber = 0;
-    while (true) {
-        yield 'creatorWorker' + sequenceNumber;
-        sequenceNumber++;
-    }
+function generateWorkerId(): string {
+    return `creatorWorker-${Math.random().toFixed(16).toString().slice(2)}`;
 }
 
 async function loadTextureConfig({src, path}: {src: string, path: string}) {
