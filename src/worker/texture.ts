@@ -10,4 +10,3 @@ const createTexture: TextureCreator = async (imageData, color) => {
 };
 
 expose(createTexture);
-

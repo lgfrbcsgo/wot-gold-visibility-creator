@@ -11,17 +11,19 @@ const src = path.resolve(project, 'src');
 const createConfig = (inProdMode, inDevMode) => ({
     entry: './src/index.ts',
     ...inDevMode({
-        mode: 'development'
+        mode: 'development',
+        devtool: 'eval-source-map'
     }),
     ...inProdMode({
-        mode: 'production'
+        mode: 'production',
+        devtool: 'source-map'
     }),
     output: {
         path: dist,
         filename: '[name].[hash].js',
         globalObject: 'self',
         ...inProdMode({
-            publicPath: '/wot-gold-visibility-creator/',
+            publicPath: '/wot-gold-visibility-creator/'
         })
     },
     resolve: {
