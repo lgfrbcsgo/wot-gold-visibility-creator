@@ -1,6 +1,6 @@
 language: rust
 
-rust: 1.34.1
+rust: 1.36.0
 
 cache:
   - cargo
@@ -15,7 +15,8 @@ before_install:
   - npm install -g elm@0.19.0-no-deps elm-test@0.19.0-rev6 elm-format@0.8.1
 
 install:
-  - npm install
+  - npm ci
+  - cargo fetch --manifest-path src/worker/wasm/Cargo.toml --locked
 
 script:
   - elm-format . --validate
