@@ -97,12 +97,12 @@ update msg model =
             )
 
 
-createModPackage : Color a -> Cmd msg
+createModPackage : Color any -> Cmd msg
 createModPackage =
     encodeRgba >> startWorker
 
 
-encodeRgba : Color a -> Encode.Value
+encodeRgba : Color any -> Encode.Value
 encodeRgba color =
     let
         { red, green, blue, alpha } =

@@ -58,7 +58,7 @@ hsva =
     constructHsva
 
 
-constructRgba : Float -> Float -> Float -> Float -> Color a
+constructRgba : Float -> Float -> Float -> Float -> Color unrestricted
 constructRgba red green blue alpha =
     Rgba
         { red = red |> min 1 |> max 0
@@ -68,7 +68,7 @@ constructRgba red green blue alpha =
         }
 
 
-constructHsva : Float -> Float -> Float -> Float -> Color a
+constructHsva : Float -> Float -> Float -> Float -> Color unrestricted
 constructHsva hue saturation value alpha =
     Hsva
         { hue = hue |> min 1 |> max 0
@@ -167,7 +167,7 @@ hsvaToRgba { hue, saturation, value, alpha } =
     }
 
 
-toHsva : Color a -> HsvaRecord
+toHsva : Color any -> HsvaRecord
 toHsva color =
     case color of
         Hsva hsvaRecord ->
@@ -177,7 +177,7 @@ toHsva color =
             rgbaToHsva rgbaRecord
 
 
-toRgba : Color a -> RgbaRecord
+toRgba : Color any -> RgbaRecord
 toRgba color =
     case color of
         Hsva hsvaRecord ->
@@ -187,7 +187,7 @@ toRgba color =
             rgbaRecord
 
 
-toCss : Color a -> String
+toCss : Color any -> String
 toCss color =
     let
         { red, green, blue, alpha } =
