@@ -23,7 +23,6 @@ script:
   - elm-test
   - elm-format . --validate
 
-
 deploy:
   provider: pages
   skip_cleanup: true

@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "comlink": "^4.0.1",
+    "normalize.css": "^8.0.1",
     "text-encoding": "^0.7.0"
   }
 }

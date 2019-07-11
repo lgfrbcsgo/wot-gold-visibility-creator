@@ -135,6 +135,7 @@ subscriptions model =
 styles =
     css "./Main.css"
         { picker = "picker"
+        , button = "button"
         }
 
 
@@ -152,7 +153,7 @@ view model =
             [ div [ styles.class .picker ]
                 [ Picker.view model.color model.picker |> map Picker
                 ]
-            , button [ onClick CreateModPackage ]
+            , button [ styles.class .button, onClick CreateModPackage ]
                 [ text "Run"
                 ]
             ]

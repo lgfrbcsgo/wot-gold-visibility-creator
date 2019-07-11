@@ -1,4 +1,16 @@
+@import '~normalize.css';
+
+body {
+    margin: 1.5rem;
+}
+
 .picker {
-    width: 25rem;
+    max-width: 25rem;
     height: 15rem;
+}
+
+.button {
+    max-width: 25rem;
+    width: 100%;
+    margin-top: 1.5rem;
 }
