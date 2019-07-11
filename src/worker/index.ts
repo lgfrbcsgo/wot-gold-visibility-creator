@@ -41,16 +41,14 @@ async function createTexture(color: Rgba, imageData: ImageData): Promise<Blob> {
     // Save worker to window object. Otherwise Edge and Safari will destroy the worker thread.
     self[workerId] = new Worker('./texture', {type: 'module'});
 
-    let textureData: Uint8Array;
     try {
         const creator = wrap<TextureCreator>(self[workerId]);
-        textureData = await creator(imageData, color);
+        const textureData = await creator(imageData, color);
+        return new Blob([textureData]);
     } finally {
         self[workerId].terminate();
         delete self[workerId];
     }
-
-    return new Blob([textureData]);
 }
 
 function loadTextureResource(): (config: TextureConfig) => Promise<TextureResource> {
