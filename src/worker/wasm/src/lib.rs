@@ -47,37 +47,18 @@ impl Into<Color> for JsColor {
     }
 }
 
-#[wasm_bindgen]
-extern "C" {
-    pub type JsImageData;
-
-    #[wasm_bindgen(method, getter)]
-    fn data(this: &JsImageData) -> Vec<u8>;
-
-    #[wasm_bindgen(method, getter)]
-    fn height(this: &JsImageData) -> u32;
-
-    #[wasm_bindgen(method, getter)]
-    fn width(this: &JsImageData) -> u32;
-}
-
-impl Into<ImageData> for JsImageData {
-    fn into(self) -> ImageData {
-        ImageData {
-            data: self.data(),
-            height: self.height(),
-            width: self.width()
-        }
-    }
-}
-
 
 // ---- Rust exports ----
 
 
 #[wasm_bindgen]
-pub fn create(image_data: JsImageData, color: JsColor) -> Vec<u8> {
+pub fn create(color: JsColor, data: Vec<u8>, height: u32, width: u32) -> Vec<u8> {
     set_panic_hook();
-    create_texture(&image_data.into(), &color.into())
+
+    let image_data = ImageData {
+        data, height, width
+    };
+
+    create_texture(&image_data, &color.into())
         .unwrap_throw()
 }

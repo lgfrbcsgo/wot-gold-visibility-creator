@@ -5,7 +5,7 @@ import {polyfillTextEncoder} from '../polyfills';
 const createTexture: TextureCreator = async (imageData, color) => {
     await polyfillTextEncoder();
     const { create } = await import('./wasm/pkg');
-    const data = create(imageData, color);
+    const data = create(color, new Uint8Array(imageData.data), imageData.height, imageData.width);
     return transfer(data, [data.buffer]);
 };
 

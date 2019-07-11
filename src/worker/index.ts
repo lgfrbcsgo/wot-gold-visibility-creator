@@ -2,7 +2,7 @@ import {wrap} from 'comlink';
 import {loadImageData} from './image';
 import {createZipFile, ZipEntry} from './zip';
 import {TextureCreator} from './types';
-import {cache, executeConcurrently, LazyPromise} from "../util";
+import {cache, executeConcurrently, LazyPromise} from '../util';
 import {Rgba} from '../types';
 import packageConfig from '../../res/worker/package.config.json';
 
@@ -21,9 +21,9 @@ const loadResources = cache(() => Promise.all(
 ));
 
 export async function createModPackage(color: Rgba): Promise<Blob> {
-    const config = await loadResources();
+    const resources = await loadResources();
     const zipEntries = executeConcurrently(
-        2, config.map(createZipEntry(color))
+        2, resources.map(createZipEntry(color))
     );
     return await createZipFile(zipEntries);
 }
