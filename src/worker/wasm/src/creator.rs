@@ -11,7 +11,6 @@ pub mod errors {
         foreign_links {
             DdsFile(::ddsfile::Error);
             Image(::image::ImageError);
-            IO(::std::io::Error);
         }
         errors {}
     }
