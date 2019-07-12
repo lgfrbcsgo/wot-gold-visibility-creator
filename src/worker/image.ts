@@ -21,15 +21,15 @@ async function loadImage(url: string): Promise<HTMLImageElement | ImageBitmap> {
         image.onerror = () => reject();
     });
 
+    if (self.createImageBitmap) {
+        // decode image data off the main thread in Firefox
+        return await self.createImageBitmap(await loading);
+    }
+
     if (image.decode) {
         // decode image data off the main thread in Chrome and Safari
         await image.decode();
     }
 
-    if (self.createImageBitmap) {
-        // decode image data off the main thread in Firefox
-        return await self.createImageBitmap(await loading);
-    } else {
-        return await loading;
-    }
+    return await loading;
 }
