@@ -1,6 +1,7 @@
 use ddsfile::{Dds, D3DFormat};
 use image::dxt::{DXTEncoder, DXTVariant};
 
+
 pub mod errors {
     error_chain! {
         types {
@@ -18,6 +19,7 @@ pub mod errors {
 
 use errors::CreateResult;
 
+
 pub struct Color {
     pub red: u8,
     pub green: u8,
@@ -31,34 +33,23 @@ pub struct ImageData {
     pub width: u32
 }
 
-impl ImageData {
-    pub fn map_data(&self, map: impl Fn(&Vec<u8>) -> Vec<u8>) -> ImageData {
-        ImageData {
-            width: self.width,
-            height: self.height,
-            data: map(&self.data)
-        }
-    }
+
+pub fn create_texture(mut image_data: ImageData, color: &Color) -> CreateResult<Vec<u8>> {
+    replace_color_information(color, &mut image_data.data);
+    encode_dds(&image_data)
 }
 
-pub fn create_texture(image_data: &ImageData, color: &Color) -> CreateResult<Vec<u8>> {
-    let tinted_image_data = image_data.map_data(|data| create_texture_data(color, data));
-    encode_dds(&tinted_image_data)
-}
-
-fn create_texture_data(color: &Color, data: &Vec<u8>) -> Vec<u8> {
+fn replace_color_information(color: &Color, data: &mut Vec<u8>) {
     let Color { red, green, blue, alpha } = color;
 
-    data
-        .iter()
-        .enumerate()
-        .map(|(index, value)| (match index % 4 {
+    for index in 0..data.len() {
+        data[index] = match index % 4 {
             0 => *red,
             1 => *green,
             2 => *blue,
-            _ => (*alpha * *value as f32) as u8,
-        }))
-        .collect::<Vec<u8>>()
+            _ => (data[index] as f32 * *alpha) as u8,
+        };
+    }
 }
 
 fn encode_dds(image_data: &ImageData) -> CreateResult<Vec<u8>> {

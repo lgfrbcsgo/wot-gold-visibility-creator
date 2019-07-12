@@ -6,10 +6,7 @@ const createTexture: TextureCreator = async (imageData, color) => {
     await polyfillTextEncoder();
     const { create } = await import('./wasm/pkg');
 
-    const data = create(
-        color.red, color.green, color.blue, color.alpha,
-        new Uint8Array(imageData.data), imageData.height, imageData.width
-    );
+    const data = create(imageData, color);
 
     return transfer(data, [data.buffer]);
 };
