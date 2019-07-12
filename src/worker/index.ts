@@ -17,13 +17,14 @@ interface TextureResource {
 }
 
 const loadResources = cache(() => Promise.all(
-    packageConfig.map(loadTextureResource())
+    packageConfig.map(loadTextureResource)
 ));
 
 export async function createModPackage(color: Rgba): Promise<Blob> {
     const resources = await loadResources();
+    const createZipEntryPartial = createZipEntry(color);
     const zipEntries = executeConcurrently(
-        2, resources.map(createZipEntry(color))
+        2, resources.map(createZipEntryPartial)
     );
     return await createZipFile(zipEntries);
 }
@@ -51,14 +52,12 @@ async function createTexture(color: Rgba, imageData: ImageData): Promise<Blob> {
     }
 }
 
-function loadTextureResource(): (config: TextureConfig) => Promise<TextureResource> {
-    return async ({path, src}) => {
-        const imageUrl = require('../../res/worker/' + src);
-        return {
-            path,
-            imageData: await loadImageData(imageUrl)
-        };
-    }
+async function loadTextureResource(config: TextureConfig): Promise<TextureResource> {
+    const imageUrl = require('../../res/worker/' + config.src);
+    return {
+        path: config.path,
+        imageData: await loadImageData(imageUrl)
+    };
 }
 
 function generateWorkerId(): string {
