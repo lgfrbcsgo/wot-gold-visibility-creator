@@ -97,16 +97,12 @@ view color (Model model) =
                 []
 
         viewBackground =
-            WebGL.toHtml
-                [ width 1000
-                , height 1000
-                ]
+            WebGL.toHtml [ width 100, height 100 ]
                 [ WebGL.entity
                     vertexShader
                     fragmentShader
                     mesh
-                    { hue = color |> toHsva |> .hue
-                    }
+                    { hue = color |> toHsva |> .hue }
                 ]
     in
     matrixInput Slider viewThumb viewBackground relativePosition model
