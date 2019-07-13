@@ -98,12 +98,23 @@ const createConfig = (inProdMode, inDevMode) => ({
     },
     devServer: {
         contentBase: dist,
+        historyApiFallback: {
+            rewrites: [{
+                from: /.+/,
+                to: (context) => `${context.parsedUrl.pathname}.html`
+            }]
+        }
     },
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: path.resolve(src, 'index.html')
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'error.html',
+            template: path.resolve(src, 'error.html'),
+            inject: false
         }),
         new WasmPackPlugin({
             crateDirectory: path.resolve(src, 'worker/wasm'),
