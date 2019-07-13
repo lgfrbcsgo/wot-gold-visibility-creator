@@ -4,7 +4,7 @@ import Basics
 import Color exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
-import Picker.Shared exposing (slider, styles)
+import Picker.Shared exposing (sliderInput, styles)
 import Slider
 
 
@@ -96,4 +96,4 @@ view color (Model model) =
             div [ styles.class .hueGradient ]
                 []
     in
-    slider Slider viewThumb viewBackground relativePosition model
+    sliderInput Slider viewThumb viewBackground relativePosition model

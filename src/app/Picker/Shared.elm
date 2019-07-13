@@ -1,4 +1,4 @@
-module Picker.Shared exposing (matrix, slider, styles)
+module Picker.Shared exposing (matrixInput, sliderInput, styles)
 
 import CssModules exposing (css)
 import Html exposing (Html, div)
@@ -23,11 +23,11 @@ baseStyles =
         }
 
 
-matrix =
+matrixInput =
     base (baseStyles.toString .matrix)
 
 
-slider =
+sliderInput =
     base (baseStyles.toString .slider)
 
 
