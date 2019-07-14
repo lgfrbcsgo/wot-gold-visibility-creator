@@ -4,8 +4,7 @@ import Basics
 import Color exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (height, style, width)
-import Math.Vector2 exposing (Vec2)
-import Math.Vector3 exposing (Vec3, vec3)
+import Math.Vector2 exposing (Vec2, vec2)
 import Picker.Shared exposing (matrixInput)
 import Slider
 import WebGL exposing (Mesh, Shader)
@@ -112,16 +111,16 @@ view color (Model model) =
 ---- MESH ---
 
 
-mesh : Mesh { position : Vec3 }
+mesh : Mesh { position : Vec2 }
 mesh =
     WebGL.triangles
-        [ ( { position = vec3 -1 1 0 }
-          , { position = vec3 1 1 0 }
-          , { position = vec3 -1 -1 0 }
+        [ ( { position = vec2 -1 1 }
+          , { position = vec2 1 1 }
+          , { position = vec2 -1 -1 }
           )
-        , ( { position = vec3 -1 -1 0 }
-          , { position = vec3 1 1 0 }
-          , { position = vec3 1 -1 0 }
+        , ( { position = vec2 -1 -1 }
+          , { position = vec2 1 1 }
+          , { position = vec2 1 -1 }
           )
         ]
 
@@ -130,15 +129,15 @@ mesh =
 ---- SHADERS ----
 
 
-vertexShader : Shader { position : Vec3 } { hue : Float } { saturationValue : Vec2 }
+vertexShader : Shader { position : Vec2 } { hue : Float } { saturationValue : Vec2 }
 vertexShader =
     [glsl|
-        attribute vec3 position;
+        attribute vec2 position;
         varying vec2 saturationValue;
 
         void main () {
-            gl_Position = vec4(position, 1.0);
-            saturationValue = (position.xy + 1.0) / 2.0;
+            saturationValue = (position + 1.0) / 2.0;
+            gl_Position = vec4(position, 0.0, 1.0);
         }
     |]
 
@@ -152,8 +151,7 @@ fragmentShader =
         varying vec2 saturationValue;
 
         // Source: http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-        vec3 hsv2rgb(vec3 c)
-        {
+        vec3 hsvToRgb(vec3 c) {
             vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
             vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
             return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
@@ -161,6 +159,6 @@ fragmentShader =
 
         void main () {
             vec3 hsv = vec3(hue, saturationValue);
-            gl_FragColor = vec4(hsv2rgb(hsv), 1.0);
+            gl_FragColor = vec4(hsvToRgb(hsv), 1.0);
         }
     |]
