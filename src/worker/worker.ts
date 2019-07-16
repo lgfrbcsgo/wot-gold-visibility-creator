@@ -1,14 +1,35 @@
 import {expose, transfer} from 'comlink';
-import {TextureCreator} from './types';
 import {polyfillTextEncoder} from '../polyfills';
+import {Rgba} from '../types';
+import {WorkerExports, ImageData} from './types';
 
-const createTexture: TextureCreator = async (imageData, color) => {
+async function encodeTexture(imageData: ImageData, color: Rgba) {
     await polyfillTextEncoder();
-    const { create } = await import('./wasm/pkg');
+    const {encode} = await import('./wasm/pkg');
 
-    const data = create(imageData, color);
+    const data = encode(imageData, color);
 
     return transfer(data, [data.buffer]);
-};
+}
 
-expose(createTexture);
+async function decodeResource(data: Uint8Array): Promise<ImageData> {
+    await polyfillTextEncoder();
+    const {decode} = await import('./wasm/pkg');
+
+    const rustImageData = decode(data);
+    try {
+        const imageData = {
+            data: rustImageData.data,
+            width: rustImageData.width,
+            height: rustImageData.height
+        };
+        return transfer(imageData, [imageData.data.buffer]);
+    } finally {
+        rustImageData.free();
+    }
+}
+
+expose(<WorkerExports>{
+    encodeTexture,
+    decodeResource
+});

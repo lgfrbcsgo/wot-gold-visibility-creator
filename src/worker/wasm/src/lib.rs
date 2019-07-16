@@ -1,8 +1,15 @@
 use wasm_bindgen::prelude::*;
 
-mod creator;
-use creator::*;
+mod decoder;
+use decoder::*;
 
+mod encoder;
+use encoder::*;
+
+mod structs;
+use structs::*;
+
+mod errors;
 
 #[macro_use]
 extern crate error_chain;
@@ -77,8 +84,43 @@ impl Into<ImageData> for JsImageData {
 
 
 #[wasm_bindgen]
-pub fn create(image_data: JsImageData, color: JsColor) -> Vec<u8> {
+pub struct RustImageData {
+    image_data: ImageData
+}
+
+#[wasm_bindgen]
+impl RustImageData {
+    fn new(image_data: ImageData) -> Self {
+        RustImageData {image_data}
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn height(&self) -> u32 {
+        self.image_data.height
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn width(&self) -> u32 {
+        self.image_data.width
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn data(&self) -> Vec<u8> {
+        self.image_data.data.clone()
+    }
+}
+
+
+#[wasm_bindgen]
+pub fn encode(image_data: JsImageData, color: JsColor) -> Vec<u8> {
     set_panic_hook();
-    create_texture(image_data.into(), &color.into())
+    encode_texture(image_data.into(), &color.into())
         .unwrap_throw()
+}
+
+#[wasm_bindgen]
+pub fn decode(data: Vec<u8>) -> RustImageData {
+    set_panic_hook();
+    RustImageData::new(decode_resource(data)
+        .unwrap_throw())
 }

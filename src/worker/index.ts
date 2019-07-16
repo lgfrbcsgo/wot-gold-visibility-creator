@@ -1,7 +1,6 @@
 import {wrap} from 'comlink';
-import {loadImageData} from './image';
 import {createZipFile, ZipEntry} from './zip';
-import {TextureCreator} from './types';
+import {ImageData, WorkerExports} from './types';
 import {cache, executeConcurrently, LazyPromise} from '../util';
 import {Rgba} from '../types';
 import packageConfig from '../../res/worker/package.config.json';
@@ -37,29 +36,42 @@ function createZipEntry(color: Rgba): (data: TextureResource) => LazyPromise<Zip
 }
 
 async function createTexture(color: Rgba, imageData: ImageData): Promise<Blob> {
-    const workerId = generateWorkerId();
+    for (const {encodeTexture} of spawnWorker()) {
+        const textureData = await encodeTexture(imageData, color);
+        return new Blob([textureData]);
+    }
+    throw 'Could not spawn worker.';
+}
+
+async function loadTextureResource(config: TextureConfig): Promise<TextureResource> {
+    for (const {decodeResource} of spawnWorker()) {
+        const imageUrl = require('../../res/worker/' + config.src);
+        const response = await fetch(imageUrl);
+        const data = await response.arrayBuffer();
+
+        const imageData = await decodeResource(new Uint8Array(data));
+        return {
+            imageData,
+            path: config.path
+        };
+    }
+    throw 'Could not spawn worker.';
+}
+
+
+/**
+ * Python style context manager to be used in for each loop.
+ */
+function* spawnWorker() {
+    const workerId = `creatorWorker-${Math.random().toFixed(16).toString().slice(2)}`;
 
     // Save worker to window object. Otherwise Edge and Safari will destroy the worker thread.
     self[workerId] = new Worker('./worker', {type: 'module'});
 
     try {
-        const creator = wrap<TextureCreator>(self[workerId]);
-        const textureData = await creator(imageData, color);
-        return new Blob([textureData]);
+        yield wrap<WorkerExports>(self[workerId]);
     } finally {
         self[workerId].terminate();
         delete self[workerId];
     }
-}
-
-async function loadTextureResource(config: TextureConfig): Promise<TextureResource> {
-    const imageUrl = require('../../res/worker/' + config.src);
-    return {
-        path: config.path,
-        imageData: await loadImageData(imageUrl)
-    };
-}
-
-function generateWorkerId(): string {
-    return `creatorWorker-${Math.random().toFixed(16).toString().slice(2)}`;
 }

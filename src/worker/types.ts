@@ -1,6 +1,16 @@
 import {Rgba} from '../types';
 
-/**
- * Defines contract between creator worker and main thread.
- */
-export type TextureCreator = (imageData: ImageData, color: Rgba) => Promise<Uint8Array>
+export interface ImageData {
+    data: Uint8Array;
+    width: number;
+    height: number;
+}
+
+export interface WorkerExports {
+    encodeTexture: TextureEncoder;
+    decodeResource: ResourceDecoder;
+}
+
+export type TextureEncoder = (imageData: ImageData, color: Rgba) => Promise<Uint8Array>;
+
+export type ResourceDecoder = (data: Uint8Array) => Promise<ImageData>;
