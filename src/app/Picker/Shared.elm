@@ -11,6 +11,7 @@ styles =
         { picker = "picker"
         , checkerboard = "checkerboard"
         , hueGradient = "hue-gradient"
+        , canvas = "canvas"
         }
 
 

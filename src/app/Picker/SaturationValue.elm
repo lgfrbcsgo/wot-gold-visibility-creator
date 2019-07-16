@@ -6,7 +6,7 @@ import Html exposing (Attribute, Html, div)
 import Html.Attributes exposing (height, style, width)
 import Math.Vector2 exposing (Vec2, vec2)
 import Math.Vector3 exposing (Vec3, vec3)
-import Picker.Shared exposing (matrixInput)
+import Picker.Shared exposing (matrixInput, styles)
 import Slider
 import WebGL exposing (Mesh, Shader)
 
@@ -107,7 +107,7 @@ viewBackground extraAttributes color =
                 |> mapValue 1
                 |> toRgba
     in
-    WebGL.toHtml (extraAttributes ++ [ width 100, height 100 ])
+    WebGL.toHtml (extraAttributes ++ [ width 100, height 100, styles.class .canvas ])
         [ WebGL.entity
             vertexShader
             fragmentShader
