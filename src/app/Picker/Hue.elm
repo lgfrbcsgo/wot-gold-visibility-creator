@@ -2,7 +2,7 @@ module Picker.Hue exposing (Model, Msg, init, subscriptions, update, view)
 
 import Basics
 import Color exposing (..)
-import Html exposing (Html, div)
+import Html exposing (Attribute, Html, div)
 import Html.Attributes exposing (style)
 import Picker.Shared exposing (sliderInput, styles)
 import Slider
@@ -29,8 +29,8 @@ type Msg
     = Slider Slider.Msg
 
 
-update : Msg -> Hsva -> Model -> ( Hsva, Model )
-update (Slider msg) color (Model model) =
+update : Msg -> Model -> Hsva -> ( Hsva, Model )
+update (Slider msg) (Model model) color =
     let
         relativePosition =
             colorToRelativePosition color
@@ -75,25 +75,26 @@ subscriptions (Model model) =
 ---- VIEW ----
 
 
-view : Hsva -> Model -> Html Msg
-view color (Model model) =
-    let
-        relativePosition =
-            colorToRelativePosition color
+view : Model -> Hsva -> Html Msg
+view (Model model) color =
+    sliderInput Slider colorToRelativePosition viewThumb viewBackground model color
 
-        thumbBackground =
+
+viewThumb : List (Attribute Slider.Msg) -> Hsva -> Html Slider.Msg
+viewThumb extraAttributes color =
+    let
+        backgroundColor =
             color
                 |> mapSaturation 1
                 |> mapValue 1
                 |> mapAlpha 1
                 |> toCss
-
-        viewThumb =
-            div [ style "backgroundColor" thumbBackground ]
-                []
-
-        viewBackground =
-            div [ styles.class .hueGradient ]
-                []
     in
-    sliderInput Slider viewThumb viewBackground relativePosition model
+    div (extraAttributes ++ [ style "backgroundColor" backgroundColor ])
+        []
+
+
+viewBackground : List (Attribute Slider.Msg) -> Hsva -> Html Slider.Msg
+viewBackground extraAttributes _ =
+    div (extraAttributes ++ [ styles.class .hueGradient ])
+        []

@@ -1,6 +1,6 @@
 module Picker exposing (Model, Msg, init, subscriptions, update, view)
 
-import Color exposing (..)
+import Color exposing (Hsva)
 import Html exposing (Html, div)
 import Picker.Alpha as Alpha
 import Picker.Hue as Hue
@@ -29,20 +29,35 @@ type Msg
     | Alpha Alpha.Msg
 
 
-update : Msg -> Hsva -> Model -> ( Hsva, Model )
-update msg color model =
+update : Msg -> Model -> Hsva -> ( Hsva, Model )
+update msg model color =
     case msg of
         Hue hueMsg ->
-            Hue.update hueMsg color model.hue
-                |> Tuple.mapSecond (\updatedModel -> { model | hue = updatedModel })
+            Hue.update hueMsg model.hue color
+                |> Tuple.mapSecond (mapHue model)
 
         SaturationValue saturationValueMsg ->
-            SaturationValue.update saturationValueMsg color model.saturationValue
-                |> Tuple.mapSecond (\updatedModel -> { model | saturationValue = updatedModel })
+            SaturationValue.update saturationValueMsg model.saturationValue color
+                |> Tuple.mapSecond (mapSaturationValue model)
 
         Alpha alphaMsg ->
-            Alpha.update alphaMsg color model.alpha
-                |> Tuple.mapSecond (\updatedModel -> { model | alpha = updatedModel })
+            Alpha.update alphaMsg model.alpha color
+                |> Tuple.mapSecond (mapAlpha model)
+
+
+mapHue : Model -> Hue.Model -> Model
+mapHue model hue =
+    { model | hue = hue }
+
+
+mapSaturationValue : Model -> SaturationValue.Model -> Model
+mapSaturationValue model saturationValue =
+    { model | saturationValue = saturationValue }
+
+
+mapAlpha : Model -> Alpha.Model -> Model
+mapAlpha model alpha =
+    { model | alpha = alpha }
 
 
 subscriptions : Model -> Sub Msg
@@ -54,10 +69,10 @@ subscriptions model =
         ]
 
 
-view : Hsva -> Model -> Html Msg
-view color model =
+view : Model -> Hsva -> Html Msg
+view model color =
     div [ styles.class .picker ]
-        [ Hue.view color model.hue |> Html.map Hue
-        , SaturationValue.view color model.saturationValue |> Html.map SaturationValue
-        , Alpha.view color model.alpha |> Html.map Alpha
+        [ Hue.view model.hue color |> Html.map Hue
+        , SaturationValue.view model.saturationValue color |> Html.map SaturationValue
+        , Alpha.view model.alpha color |> Html.map Alpha
         ]

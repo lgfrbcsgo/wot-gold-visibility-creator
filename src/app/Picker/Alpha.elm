@@ -2,7 +2,7 @@ module Picker.Alpha exposing (Model, Msg, init, subscriptions, update, view)
 
 import Basics
 import Color exposing (..)
-import Html exposing (Html, div)
+import Html exposing (Attribute, Html, div)
 import Html.Attributes exposing (style)
 import Picker.Shared exposing (sliderInput, styles)
 import Slider
@@ -29,8 +29,8 @@ type Msg
     = Slider Slider.Msg
 
 
-update : Msg -> Hsva -> Model -> ( Hsva, Model )
-update (Slider msg) color (Model model) =
+update : Msg -> Model -> Hsva -> ( Hsva, Model )
+update (Slider msg) (Model model) color =
     let
         relativePosition =
             colorToRelativePosition color
@@ -71,27 +71,29 @@ subscriptions (Model model) =
 ---- VIEW ----
 
 
-view : Hsva -> Model -> Html Msg
-view color (Model model) =
-    let
-        relativePosition =
-            colorToRelativePosition color
+view : Model -> Hsva -> Html Msg
+view (Model model) color =
+    sliderInput Slider colorToRelativePosition viewThumb viewBackground model color
 
+
+viewThumb : List (Attribute Slider.Msg) -> Hsva -> Html Slider.Msg
+viewThumb extraAttributes color =
+    let
+        backgroundColor =
+            color |> toCss
+    in
+    div (extraAttributes ++ [ styles.class .checkerboard, style "backgroundColor" backgroundColor ])
+        []
+
+
+viewBackground : List (Attribute Slider.Msg) -> Hsva -> Html Slider.Msg
+viewBackground extraAttributes color =
+    let
         gradientColor =
             color |> mapAlpha 1 |> toCss
 
         gradient =
             "linear-gradient(to right, transparent, " ++ gradientColor ++ ")"
-
-        thumbBackgroundColor =
-            color |> toCss
-
-        viewThumb =
-            div [ styles.class .checkerboard, style "backgroundColor" thumbBackgroundColor ]
-                []
-
-        viewBackground =
-            div [ styles.class .checkerboard, style "background" gradient ]
-                []
     in
-    sliderInput Slider viewThumb viewBackground relativePosition model
+    div (extraAttributes ++ [ styles.class .checkerboard, style "background" gradient ])
+        []

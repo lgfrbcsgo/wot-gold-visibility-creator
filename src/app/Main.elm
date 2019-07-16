@@ -64,6 +64,23 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        RandomColor color ->
+            ( { model | color = color }
+            , Cmd.none
+            )
+
+        Picker pickerMsg ->
+            let
+                ( updatedColor, updatedPickerModel ) =
+                    Picker.update pickerMsg model.picker model.color
+            in
+            ( { model
+                | color = updatedColor
+                , picker = updatedPickerModel
+              }
+            , Cmd.none
+            )
+
         CreateModPackage ->
             case model.running of
                 False ->
@@ -76,23 +93,6 @@ update msg model =
 
         FinishedModPackage ->
             ( { model | running = False }
-            , Cmd.none
-            )
-
-        Picker pickerMsg ->
-            let
-                ( updatedColor, updatedPickerModel ) =
-                    Picker.update pickerMsg model.color model.picker
-            in
-            ( { model
-                | color = updatedColor
-                , picker = updatedPickerModel
-              }
-            , Cmd.none
-            )
-
-        RandomColor color ->
-            ( { model | color = color }
             , Cmd.none
             )
 
@@ -121,10 +121,10 @@ encodeRgba color =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions { picker } =
     Sub.batch
         [ always FinishedModPackage |> finishedModPackage
-        , Sub.map Picker <| Picker.subscriptions model.picker
+        , Sub.map Picker <| Picker.subscriptions picker
         ]
 
 
@@ -144,14 +144,14 @@ styles =
 
 
 view : Model -> Html Msg
-view model =
-    if model.running then
+view { picker, color, running } =
+    if running then
         text "Running..."
 
     else
         div []
             [ div [ styles.class .picker ]
-                [ Picker.view model.color model.picker |> map Picker
+                [ Picker.view picker color |> map Picker
                 ]
             , button [ styles.class .button, onClick CreateModPackage ]
                 [ text "Run"

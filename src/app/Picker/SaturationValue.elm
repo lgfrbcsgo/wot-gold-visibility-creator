@@ -2,7 +2,7 @@ module Picker.SaturationValue exposing (Model, Msg, init, subscriptions, update,
 
 import Basics
 import Color exposing (..)
-import Html exposing (Html, div)
+import Html exposing (Attribute, Html, div)
 import Html.Attributes exposing (height, style, width)
 import Math.Vector2 exposing (Vec2, vec2)
 import Math.Vector3 exposing (Vec3, vec3)
@@ -32,8 +32,8 @@ type Msg
     = Slider Slider.Msg
 
 
-update : Msg -> Hsva -> Model -> ( Hsva, Model )
-update (Slider msg) color (Model model) =
+update : Msg -> Model -> Hsva -> ( Hsva, Model )
+update (Slider msg) (Model model) color =
     let
         relativePosition =
             colorToRelativePosition color
@@ -83,32 +83,37 @@ subscriptions (Model model) =
 ---- VIEW ----
 
 
-view : Hsva -> Model -> Html Msg
-view color (Model model) =
-    let
-        relativePosition =
-            colorToRelativePosition color
+view : Model -> Hsva -> Html Msg
+view (Model model) color =
+    matrixInput Slider colorToRelativePosition viewThumb viewBackground model color
 
+
+viewThumb : List (Attribute Slider.Msg) -> Hsva -> Html Slider.Msg
+viewThumb extraAttributes color =
+    let
         thumbBackgroundColor =
             color |> mapAlpha 1 |> toCss
-
-        viewThumb =
-            div [ style "backgroundColor" thumbBackgroundColor ]
-                []
-
-        baseColor =
-            color |> toRgba
-
-        viewBackground =
-            WebGL.toHtml [ width 100, height 100 ]
-                [ WebGL.entity
-                    vertexShader
-                    fragmentShader
-                    mesh
-                    { baseColor = vec3 baseColor.red baseColor.green baseColor.blue }
-                ]
     in
-    matrixInput Slider viewThumb viewBackground relativePosition model
+    div (extraAttributes ++ [ style "backgroundColor" thumbBackgroundColor ])
+        []
+
+
+viewBackground : List (Attribute Slider.Msg) -> Hsva -> Html Slider.Msg
+viewBackground extraAttributes color =
+    let
+        baseColor =
+            color
+                |> mapSaturation 1
+                |> mapValue 1
+                |> toRgba
+    in
+    WebGL.toHtml (extraAttributes ++ [ width 100, height 100 ])
+        [ WebGL.entity
+            vertexShader
+            fragmentShader
+            mesh
+            { baseColor = vec3 baseColor.red baseColor.green baseColor.blue }
+        ]
 
 
 
