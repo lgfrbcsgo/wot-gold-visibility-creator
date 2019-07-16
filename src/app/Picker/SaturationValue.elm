@@ -112,7 +112,12 @@ viewBackground extraAttributes color =
             vertexShader
             fragmentShader
             mesh
-            { baseColor = vec3 baseColor.red baseColor.green baseColor.blue }
+            { baseColor =
+                vec3
+                    baseColor.red
+                    baseColor.green
+                    baseColor.blue
+            }
         ]
 
 

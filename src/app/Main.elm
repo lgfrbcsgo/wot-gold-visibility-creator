@@ -45,7 +45,7 @@ randomColor : Random.Generator Hsva
 randomColor =
     Random.map4 hsva
         (Random.float 0 1)
-        (Random.float 0.5 1)
+        (Random.float 0.3 1)
         (Random.float 0.65 1)
         (Random.float 1 1)
 
