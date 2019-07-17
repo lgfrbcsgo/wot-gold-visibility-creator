@@ -6,7 +6,7 @@
     <title>Gold Visibility Creator</title>
     {{#if htmlWebpackPlugin.options.includeErrorRedirect}}
     <script>
-        addEventListener('error.hbs', function () {
+        addEventListener('error', function () {
             location.href = 'error';
         });
     </script>
