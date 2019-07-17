@@ -93,7 +93,11 @@ const createConfig = (inProdMode, inDevMode) => ({
                         name: '[hash].[ext]'
                     }
                 }
-            }
+            },
+            {
+                test: /\.hbs$/,
+                loader: 'handlebars-loader'
+            },
         ]
     },
     devServer: {
@@ -109,11 +113,17 @@ const createConfig = (inProdMode, inDevMode) => ({
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            template: path.resolve(src, 'index.html')
+            template: path.resolve(src, 'index.hbs'),
+            ...inDevMode({
+                includeErrorRedirect: false
+            }),
+            ...inProdMode({
+                includeErrorRedirect: true
+            })
         }),
         new HtmlWebpackPlugin({
             filename: 'error.html',
-            template: path.resolve(src, 'error.html'),
+            template: path.resolve(src, 'error.hbs'),
             inject: false
         }),
         new WasmPackPlugin({
