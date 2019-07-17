@@ -1,7 +1,8 @@
+import './polyfills';
+
 import {Elm} from './app/Main';
 import {rethrow, saveBlob} from './util';
 import {Rgba} from './types';
-import './polyfills';
 
 const app = Elm.Main.init({
     node: document.getElementById('app')
