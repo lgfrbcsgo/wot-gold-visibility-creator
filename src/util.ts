@@ -73,11 +73,3 @@ export async function* executeConcurrently<T>(
         yield await race();
     }
 }
-
-export async function awaitAllValues<T>(asyncIterator: AsyncIterableIterator<T>) {
-    const returnValue = [];
-    for await (const value of asyncIterator) {
-        returnValue.push(value);
-    }
-    return returnValue;
-}

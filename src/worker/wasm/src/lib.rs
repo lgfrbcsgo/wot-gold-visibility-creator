@@ -1,8 +1,5 @@
 use wasm_bindgen::prelude::*;
 
-mod decoder;
-use decoder::*;
-
 mod encoder;
 use encoder::*;
 
@@ -82,45 +79,9 @@ impl Into<ImageData> for JsImageData {
 
 // ---- Rust exports ----
 
-
-#[wasm_bindgen]
-pub struct RustImageData {
-    image_data: ImageData
-}
-
-#[wasm_bindgen]
-impl RustImageData {
-    fn new(image_data: ImageData) -> Self {
-        RustImageData {image_data}
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn height(&self) -> u32 {
-        self.image_data.height
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn width(&self) -> u32 {
-        self.image_data.width
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn data(&self) -> Vec<u8> {
-        self.image_data.data.clone()
-    }
-}
-
-
 #[wasm_bindgen]
 pub fn encode(image_data: JsImageData, color: JsColor) -> Vec<u8> {
     set_panic_hook();
     encode_texture(image_data.into(), &color.into())
         .unwrap_throw()
-}
-
-#[wasm_bindgen]
-pub fn decode(data: Vec<u8>) -> RustImageData {
-    set_panic_hook();
-    RustImageData::new(decode_resource(data)
-        .unwrap_throw())
 }

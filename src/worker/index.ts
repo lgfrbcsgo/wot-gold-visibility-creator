@@ -1,9 +1,10 @@
 import {wrap} from 'comlink';
 import {createZipFile, ZipEntry} from './zip';
-import {ImageData, WorkerExports} from './types';
-import {cache, executeConcurrently, LazyPromise, awaitAllValues} from '../util';
+import {WorkerExports} from './types';
+import {cache, executeConcurrently, LazyPromise} from '../util';
 import {Rgba} from '../types';
 import packageConfig from '../../res/worker/package.config.json';
+import {loadImageData} from './image';
 
 interface TextureConfig {
     path: string;
@@ -15,30 +16,28 @@ interface TextureResource {
     imageData: ImageData;
 }
 
-const loadResources = cache(
-    () => awaitAllValues(
-        executeConcurrently(
-            2, packageConfig.map(loadResource)
-        )
+const loadResourcesCached = cache(
+    () => Promise.all(
+        packageConfig.map(loadResource)
     )
 );
 
 export async function createModPackage(color: Rgba): Promise<Blob> {
-    const resources = await loadResources();
+    const resources = await loadResourcesCached();
 
-    const createZipEntryPartial = createZipEntry(color);
     const zipEntries = executeConcurrently(
-        2, resources.map(createZipEntryPartial)
+        2, resources.map(createZipEntry(color))
     );
 
     return await createZipFile(zipEntries);
 }
 
 function createZipEntry(color: Rgba): (data: TextureResource) => LazyPromise<ZipEntry> {
-    return ({path, imageData}) => async () => ({
-        path,
-        content: await createTexture(color, imageData)
-    })
+    return ({path, imageData}) =>
+        async () => ({
+            path,
+            content: await createTexture(color, imageData)
+        });
 }
 
 async function createTexture(color: Rgba, imageData: ImageData): Promise<Blob> {
@@ -49,25 +48,16 @@ async function createTexture(color: Rgba, imageData: ImageData): Promise<Blob> {
     throw 'Could not spawn worker.';
 }
 
-function loadResource(config: TextureConfig): LazyPromise<TextureResource> {
-    return async () => {
-        for (const {decodeResource} of spawnWorker()) {
-            const imageUrl = require('../../res/worker/' + config.src);
-            const response = await fetch(imageUrl);
-            const data = await response.arrayBuffer();
-
-            const imageData = await decodeResource(new Uint8Array(data));
-            return {
-                imageData,
-                path: config.path
-            };
-        }
-        throw 'Could not spawn worker.';
+async function loadResource(config: TextureConfig): Promise<TextureResource> {
+    const imageUrl = require('../../res/worker/' + config.src);
+    return {
+        imageData: await loadImageData(imageUrl),
+        path: config.path
     };
 }
 
 /**
- * Python style context manager to be used in for each loop.
+ * Python style context manager to be used in for of loop.
  */
 function* spawnWorker() {
     const workerId = `creatorWorker-${Math.random().toFixed(16).toString().slice(2)}`;

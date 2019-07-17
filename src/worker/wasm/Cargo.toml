@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 [dependencies.image]
 version = "0.21.1"
 default-features = false
-features = ["dxt", "png_codec"]
+features = ["dxt"]
 
 [dependencies]
 ddsfile = "0.2.3"
