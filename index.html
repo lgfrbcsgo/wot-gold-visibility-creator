@@ -5,13 +5,20 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
     <title>Gold Visibility Creator</title>
     <script>
-        addEventListener('error', function () {
+        addEventListener('error', function (event) {
+            if (typeof event.error === 'object') {
+                if (typeof event.error.stack === 'string') {
+                    localStorage.setItem('error', event.error.stack);
+                } else if (event.error.message) {
+                    localStorage.setItem('error', event.error.message);
+                }
+            }
             location.href = 'error';
         });
     </script>
 </head>
 <body>
     <div id="app"></div>
-<script type="text/javascript" src="/wot-gold-visibility-creator/main.aa91bffed754a638aa02.js"></script></body>
+<script type="text/javascript" src="/wot-gold-visibility-creator/main.21d27354a450e5a683b3.js"></script></body>
 </html>
 

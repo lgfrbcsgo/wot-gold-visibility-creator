@@ -7,5 +7,11 @@
 </head>
 <body>
     ERROR
+    <div id="error"></div>
+    <script>
+        var container = document.getElementById('error');
+        var error = localStorage.getItem('error');
+        container.innerText = error;
+    </script>
 </body>
 </html>
