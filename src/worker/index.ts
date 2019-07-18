@@ -1,10 +1,11 @@
 import {wrap} from 'comlink';
 import {createZipFile, ZipEntry} from './zip';
 import {WorkerExports} from './types';
-import {cache, executeConcurrently, LazyPromise} from '../util';
+import {cache, limitConcurrency, LazyPromise} from '../util';
 import {Rgba} from '../types';
+import {getImageBitmap, loadImage} from './image';
+
 import packageConfig from '../../res/worker/package.config.json';
-import {loadImageData} from './image';
 
 interface TextureConfig {
     path: string;
@@ -25,50 +26,40 @@ const loadResourcesCached = cache(
 export async function createModPackage(color: Rgba): Promise<Blob> {
     const resources = await loadResourcesCached();
 
-    const zipEntries = executeConcurrently(
-        2, resources.map(createZipEntry(color))
+    const zipEntries = limitConcurrency(
+        2, resources.map(createTexture(color))
     );
 
     return await createZipFile(zipEntries);
 }
 
-function createZipEntry(color: Rgba): (data: TextureResource) => LazyPromise<ZipEntry> {
+function createTexture(color: Rgba): (data: TextureResource) => LazyPromise<ZipEntry> {
     return ({path, imageData}) =>
         async () => ({
             path,
-            content: await createTexture(color, imageData)
+            content: await encodeTexture(color, imageData)
         });
 }
 
-async function createTexture(color: Rgba, imageData: ImageData): Promise<Blob> {
-    for (const {encodeTexture} of spawnWorker()) {
-        const textureData = await encodeTexture(imageData, color);
-        return new Blob([textureData]);
-    }
-    throw 'Could not spawn worker.';
-}
-
-async function loadResource(config: TextureConfig): Promise<TextureResource> {
-    const imageUrl = require('../../res/worker/' + config.src);
-    return {
-        imageData: await loadImageData(imageUrl),
-        path: config.path
-    };
-}
-
-/**
- * Python style context manager to be used in for of loop.
- */
-function* spawnWorker() {
+async function encodeTexture(color: Rgba, imageData: ImageData): Promise<Blob> {
     const workerId = `creatorWorker-${Math.random().toFixed(16).toString().slice(2)}`;
 
     // Save worker to window object. Otherwise Edge and Safari will destroy the worker thread.
     self[workerId] = new Worker('./worker', {type: 'module'});
 
     try {
-        yield wrap<WorkerExports>(self[workerId]);
+        const {encodeTexture} = wrap<WorkerExports>(self[workerId]);
+        const textureData = await encodeTexture(imageData, color);
+        return new Blob([textureData]);
     } finally {
         self[workerId].terminate();
         delete self[workerId];
     }
+}
+
+async function loadResource({src, path}: TextureConfig): Promise<TextureResource> {
+    const imageUrl: string = require('../../res/worker/' + src);
+    const image = await loadImage(imageUrl);
+    const imageData = getImageBitmap(image);
+    return {imageData, path};
 }

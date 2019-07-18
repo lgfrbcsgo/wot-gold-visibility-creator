@@ -3,9 +3,6 @@ use wasm_bindgen::prelude::*;
 mod encoder;
 use encoder::*;
 
-mod structs;
-use structs::*;
-
 mod errors;
 
 #[macro_use]

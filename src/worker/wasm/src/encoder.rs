@@ -2,7 +2,19 @@ use ddsfile::{Dds, D3DFormat};
 use image::dxt::{DXTEncoder, DXTVariant};
 
 use crate::errors::Result;
-use crate::structs::{ImageData, Color};
+
+pub struct Color {
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
+    pub alpha: f32
+}
+
+pub struct ImageData {
+    pub data: Vec<u8>,
+    pub height: u32,
+    pub width: u32
+}
 
 pub fn encode_texture(mut image_data: ImageData, color: &Color) -> Result<Vec<u8>> {
     replace_color_information(color, &mut image_data.data);

@@ -41,7 +41,7 @@ export function cache<T>(fn: LazyPromise<T>): LazyPromise<T> {
     }
 }
 
-export async function* executeConcurrently<T>(
+export async function* limitConcurrency<T>(
     concurrencyLevel: number, promises: Array<LazyPromise<T>>
 ): AsyncIterableIterator<T> {
 

@@ -1,17 +1,18 @@
-export async function loadImageData(url: string): Promise<ImageData> {
-    const image = await loadImage(url);
+export type Drawable = HTMLImageElement | ImageBitmap;
 
+export function getImageBitmap(image: Drawable): ImageData {
+    const {height, width} = image;
     const canvas = document.createElement('canvas') as HTMLCanvasElement;
-    canvas.height = image.height;
-    canvas.width = image.width;
+    canvas.height = height;
+    canvas.width = width;
 
     // cast to CanvasRenderingContext2D as getContext is guaranteed to not be null on a newly created Canvas
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.drawImage(image, 0, 0);
-    return ctx.getImageData(0, 0, image.width, image.height);
+    return ctx.getImageData(0, 0, width, height);
 }
 
-async function loadImage(url: string): Promise<HTMLImageElement | ImageBitmap> {
+export async function loadImage(url: string): Promise<Drawable> {
     const image = new Image();
     image.src = url;
     image.decoding = 'async';
