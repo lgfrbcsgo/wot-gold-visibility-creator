@@ -12,6 +12,8 @@ async function encodeTexture(imageData: ImageData, color: Rgba) {
     return transfer(data, [data.buffer]);
 }
 
-expose(<WorkerExports>{
+const exports: WorkerExports = {
     encodeTexture
-});
+};
+
+expose(exports);

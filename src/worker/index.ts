@@ -45,7 +45,7 @@ async function encodeTexture(color: Rgba, imageData: ImageData): Promise<Blob> {
     const workerId = `creatorWorker-${Math.random().toFixed(16).toString().slice(2)}`;
 
     // Save worker to window object. Otherwise Edge and Safari will destroy the worker thread.
-    self[workerId] = new Worker('./worker', {type: 'module'});
+    self[workerId] = new Worker('./wasm-worker', {type: 'module'});
 
     try {
         const {encodeTexture} = wrap<WorkerExports>(self[workerId]);
