@@ -2,23 +2,23 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
     <title>Gold Visibility Creator</title>
-    <script>
-        addEventListener('error', function (event) {
-            if (typeof event.error === 'object') {
-                if (typeof event.error.stack === 'string') {
-                    localStorage.setItem('error', event.error.stack);
-                } else if (event.error.message) {
-                    localStorage.setItem('error', event.error.message);
+        <script>
+            addEventListener('error', function (event) {
+                if (typeof event.error === 'object') {
+                    if (typeof event.error.stack === 'string') {
+                        localStorage.setItem('error', event.error.stack);
+                    } else if (event.error.message) {
+                        localStorage.setItem('error', event.error.message);
+                    }
                 }
-            }
-            location.href = 'error';
-        });
-    </script>
+                location.href = 'error';
+            });
+        </script>
 </head>
 <body>
-    <div id="app"></div>
-<script type="text/javascript" src="/wot-gold-visibility-creator/main.d16b3ca69950da30bdbe.js"></script></body>
+<div id="app"></div>
+<script type="text/javascript" src="/wot-gold-visibility-creator/main.5a1108de0f6e16429d0f.js"></script></body>
 </html>
 
