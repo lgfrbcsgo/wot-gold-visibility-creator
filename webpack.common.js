@@ -89,14 +89,14 @@ const createConfig = (inProdMode, inDevMode) => ({
                         loader: 'postcss-loader',
                         options: {
                             plugins: [
-                                // to catch errors early, don't disable purgecss in dev mode
-                                purgecss({
-                                    content: [
-                                        './src/**/*.elm',
-                                        './src/**/*.ts'
-                                    ],
-                                }),
                                 ...inProdMode([
+                                    purgecss({
+                                        content: [
+                                            path.resolve(src, '**/*.elm'),
+                                            path.resolve(src, '**/*.ts'),
+                                            path.resolve(src, '**/*.hbs'),
+                                        ],
+                                    }),
                                     cssnano({
                                         preset: 'default',
                                     })
