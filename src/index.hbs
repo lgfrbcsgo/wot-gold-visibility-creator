@@ -2,25 +2,25 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
     <title>Gold Visibility Creator</title>
     {{#if htmlWebpackPlugin.options.includeErrorRedirect}}
-    <script>
-        addEventListener('error', function (event) {
-            if (typeof event.error === 'object') {
-                if (typeof event.error.stack === 'string') {
-                    localStorage.setItem('error', event.error.stack);
-                } else if (event.error.message) {
-                    localStorage.setItem('error', event.error.message);
+        <script>
+            addEventListener('error', function (event) {
+                if (typeof event.error === 'object') {
+                    if (typeof event.error.stack === 'string') {
+                        localStorage.setItem('error', event.error.stack);
+                    } else if (event.error.message) {
+                        localStorage.setItem('error', event.error.message);
+                    }
                 }
-            }
-            location.href = 'error';
-        });
-    </script>
+                location.href = 'error';
+            });
+        </script>
     {{/if}}
 </head>
 <body>
-    <div id="app"></div>
+<div id="app"></div>
 </body>
 </html>
 

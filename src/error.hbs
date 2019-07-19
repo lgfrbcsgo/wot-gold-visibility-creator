@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
     <title>Gold Visibility Creator</title>
 </head>
 <body>
-    ERROR
-    <div id="error"></div>
-    <script>
-        var container = document.getElementById('error');
-        var error = localStorage.getItem('error');
-        if (error) {
-            container.innerText = error;
-        }
-    </script>
+<h3>ERROR</h3>
+<pre id="error"></pre>
+<script>
+    var container = document.getElementById('error');
+    var error = localStorage.getItem('error');
+    if (error) {
+        container.innerText = error;
+    }
+</script>
 </body>
 </html>

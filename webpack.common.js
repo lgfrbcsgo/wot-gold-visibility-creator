@@ -4,12 +4,15 @@ const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WorkerPlugin = require('worker-plugin');
 
+const purgecss = require('@fullhuman/postcss-purgecss');
+const cssnano = require('cssnano');
+
 const project = __dirname;
 const dist = path.resolve(project, 'dist');
 const src = path.resolve(project, 'src');
 
 const createConfig = (inProdMode, inDevMode) => ({
-    entry: './src/index.ts',
+    entry: path.resolve(src, 'index.ts'),
     ...inDevMode({
         mode: 'development',
         devtool: 'eval-source-map'
@@ -71,6 +74,7 @@ const createConfig = (inProdMode, inDevMode) => ({
                     {
                         loader: 'css-loader',
                         options: {
+                            importLoaders: 1,
                             modules: {
                                 ...inDevMode({
                                     localIdentName: '[path][name]__[local]--[hash:base64:5]'
@@ -79,6 +83,25 @@ const createConfig = (inProdMode, inDevMode) => ({
                                     localIdentName: '[hash:base64]'
                                 })
                             }
+                        }
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            plugins: [
+                                // to catch errors early, don't disable purgecss in dev mode
+                                purgecss({
+                                    content: [
+                                        './src/**/*.elm',
+                                        './src/**/*.ts'
+                                    ],
+                                }),
+                                ...inProdMode([
+                                    cssnano({
+                                        preset: 'default',
+                                    })
+                                ])
+                            ]
                         }
                     }
                 ]
