@@ -19,7 +19,7 @@ export async function loadImage(url: string): Promise<Drawable> {
 
     const loading = new Promise<HTMLImageElement>((resolve, reject) => {
         image.onload = () => resolve(image);
-        image.onerror = () => reject();
+        image.onerror = () => reject(new Error(`Image(src=${url}) failed to load`));
     });
 
     if (self.createImageBitmap) {
