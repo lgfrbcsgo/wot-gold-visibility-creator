@@ -18,6 +18,8 @@ module Color exposing
     , toRgba
     )
 
+import Parser exposing (Parser)
+
 
 type alias Hsva =
     Color HsvaRecord
@@ -281,3 +283,18 @@ fModBy f n =
             floor f
     in
     toFloat (modBy n integer) + f - toFloat integer
+
+
+colorParser : Parser (Color unrestricted)
+colorParser =
+    Parser.succeed (constructRgba 1 1 1 1)
+
+
+rgbaParser : Parser Rgba
+rgbaParser =
+    Parser.succeed (rgba 1 1 1 1)
+
+
+hsvaParser : Parser Hsva
+hsvaParser =
+    Parser.succeed (hsva 1 1 1 1)
