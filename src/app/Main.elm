@@ -150,11 +150,14 @@ view { picker, color, running } =
 
     else
         div []
-            [ div [ styles.class .picker ]
+            [ h1 []
+                [ text "Gold Visibility Creator"
+                ]
+            , div [ styles.class .picker ]
                 [ Picker.view picker color |> map Picker
                 ]
             , button [ styles.class .button, onClick CreateModPackage ]
-                [ text "Run"
+                [ text "Create"
                 ]
             ]
 
