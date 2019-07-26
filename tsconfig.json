@@ -11,6 +11,7 @@
     "target": "es2017",
     "sourceMap": true,
     "lib": [
+      "esnext.asynciterable",
       "es2017",
       "dom"
     ]

@@ -14,7 +14,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-typescript": "^7.3.3",
     "@fullhuman/postcss-purgecss": "^1.2.0",
-    "@types/node": "^12.0.4",
+    "@types/webpack-env": "^1.14.0",
     "@wasm-tool/wasm-pack-plugin": "0.2.7",
     "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^2.0.2",
