@@ -1,6 +1,7 @@
 module ColorTest exposing (conversions)
 
-import Color
+import Color.Hsva as Hsva exposing (Hsva, hsva)
+import Color.Rgba as Rgba exposing (Rgba, rgba)
 import Expect exposing (FloatingPointTolerance(..))
 import Fuzz exposing (..)
 import Test exposing (..)
@@ -47,8 +48,9 @@ conversion name { hue, saturation, value } { red, green, blue } =
     describe ("Converts " ++ name)
         [ fuzz validValue "from Hsva to Rgba." <|
             \alpha ->
-                Color.hsva hueFloat saturation value alpha
-                    |> Color.toRgba
+                hsva hueFloat saturation value alpha
+                    |> Hsva.toRgba
+                    |> Rgba.toRecord
                     |> Expect.all
                         [ .red >> Expect.within maxRoundingError redFloat
                         , .green >> Expect.within maxRoundingError greenFloat
@@ -57,24 +59,15 @@ conversion name { hue, saturation, value } { red, green, blue } =
                         ]
         , fuzz validValue "from Rgba to Hsva." <|
             \alpha ->
-                Color.rgba redFloat greenFloat blueFloat alpha
-                    |> Color.toHsva
+                rgba redFloat greenFloat blueFloat alpha
+                    |> Rgba.toHsva
+                    |> Hsva.toRecord
                     |> Expect.all
                         [ .hue >> Expect.within maxRoundingError hueFloat
                         , .saturation >> Expect.within maxRoundingError saturation
                         , .value >> Expect.within maxRoundingError value
                         , .alpha >> Expect.within noRoundingError alpha
                         ]
-        , fuzz validValue "from Hsva to Hsva." <|
-            \alpha ->
-                Color.hsva hueFloat saturation value alpha
-                    |> Color.toHsva
-                    |> Expect.equal (Color.HsvaRecord hueFloat saturation value alpha)
-        , fuzz validValue "from Rgba to Rgba." <|
-            \alpha ->
-                Color.rgba redFloat greenFloat blueFloat alpha
-                    |> Color.toRgba
-                    |> Expect.equal (Color.RgbaRecord redFloat greenFloat blueFloat alpha)
         ]
 
 
@@ -99,8 +92,9 @@ conversions =
         , conversion "Navy" (Hsv 240 1 0.5) (Rgb 0 0 128)
         , fuzz3 validValue validValue validValue "Conversion from Rgba to Hsva is within valid range." <|
             \red green blue ->
-                Color.rgba red green blue 1
-                    |> Color.toHsva
+                rgba red green blue 1
+                    |> Rgba.toHsva
+                    |> Hsva.toRecord
                     |> Expect.all
                         [ .hue >> Expect.atLeast 0
                         , .hue >> Expect.atMost 1
@@ -111,8 +105,9 @@ conversions =
                         ]
         , fuzz3 validValue validValue validValue "Conversion from Hsva to Rgba is within valid range." <|
             \hue saturation value ->
-                Color.hsva hue saturation value 1
-                    |> Color.toRgba
+                hsva hue saturation value 1
+                    |> Hsva.toRgba
+                    |> Rgba.toRecord
                     |> Expect.all
                         [ .red >> Expect.atLeast 0
                         , .red >> Expect.atMost 1
@@ -122,16 +117,11 @@ conversions =
                         , .blue >> Expect.atMost 1
                         ]
         , fuzz3 validValue validValue validValue "Conversion from Rgba to Rgba via Hsva has no effect." <|
-            let
-                hsvaRecordToHsva =
-                    \{ hue, saturation, value, alpha } ->
-                        Color.hsva hue saturation value alpha
-            in
             \red green blue ->
-                Color.rgba red green blue 1
-                    |> Color.toHsva
-                    |> hsvaRecordToHsva
-                    |> Color.toRgba
+                rgba red green blue 1
+                    |> Rgba.toHsva
+                    |> Hsva.toRgba
+                    |> Rgba.toRecord
                     |> Expect.all
                         [ .red >> Expect.within maxRoundingError red
                         , .green >> Expect.within maxRoundingError green

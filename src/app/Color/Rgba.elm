@@ -1,4 +1,16 @@
-module Color.Rgba exposing (Rgba, RgbaRecord, fromRecord, mapAlpha, mapBlue, mapGreen, mapRed, rgba, toCss, toRecord, toRgba)
+module Color.Rgba exposing
+    ( Rgba
+    , RgbaRecord
+    , fromRecord
+    , mapAlpha
+    , mapBlue
+    , mapGreen
+    , mapRed
+    , rgba
+    , toCss
+    , toHsva
+    , toRecord
+    )
 
 import Color.Internal as Internal
 
@@ -31,8 +43,8 @@ toCss =
     toRecord >> Internal.rgbaRecordToCss
 
 
-toRgba : Rgba -> Internal.Hsva
-toRgba =
+toHsva : Rgba -> Internal.Hsva
+toHsva =
     toRecord >> Internal.convertRgbaRecordToHsva >> Internal.hsvaFromRecord
 
 
