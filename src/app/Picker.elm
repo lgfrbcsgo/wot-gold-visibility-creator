@@ -1,11 +1,11 @@
 module Picker exposing (Model, Msg, init, subscriptions, update, view)
 
-import Color exposing (Hsva)
-import Html exposing (Html, div)
+import Color.Hsva exposing (Hsva)
+import Html as H exposing (Html)
 import Picker.Alpha as Alpha
 import Picker.Hue as Hue
+import Picker.Internal as Internal
 import Picker.SaturationValue as SaturationValue
-import Picker.Shared exposing (styles)
 
 
 type alias Model =
@@ -71,8 +71,8 @@ subscriptions model =
 
 view : Model -> Hsva -> Html Msg
 view model color =
-    div [ styles.class .picker ]
-        [ Hue.view model.hue color |> Html.map Hue
-        , SaturationValue.view model.saturationValue color |> Html.map SaturationValue
-        , Alpha.view model.alpha color |> Html.map Alpha
+    H.div [ Internal.styles.class .picker ]
+        [ Hue.view model.hue color |> H.map Hue
+        , SaturationValue.view model.saturationValue color |> H.map SaturationValue
+        , Alpha.view model.alpha color |> H.map Alpha
         ]

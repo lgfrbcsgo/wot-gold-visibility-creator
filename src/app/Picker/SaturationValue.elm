@@ -1,14 +1,15 @@
 module Picker.SaturationValue exposing (Model, Msg, init, subscriptions, update, view)
 
 import Basics
-import Color exposing (..)
-import Html exposing (Attribute, Html, div)
-import Html.Attributes exposing (height, style, width)
+import Color.Hsva as Hsva exposing (Hsva)
+import Color.Rgba as Rgba
+import Html as H exposing (Attribute, Html)
+import Html.Attributes as HA
 import Math.Vector2 exposing (Vec2, vec2)
 import Math.Vector3 exposing (Vec3, vec3)
-import Picker.Shared exposing (matrixInput, styles)
+import Picker.Internal as Internal
 import Slider
-import WebGL exposing (Mesh, Shader)
+import WebGL
 
 
 
@@ -57,15 +58,15 @@ updateColor color relativePosition =
             1 - relativePosition.y
     in
     color
-        |> mapSaturation updatedSaturation
-        |> mapValue updatedValue
+        |> Hsva.mapSaturation updatedSaturation
+        |> Hsva.mapValue updatedValue
 
 
 colorToRelativePosition : Hsva -> Slider.Position
 colorToRelativePosition color =
     let
         { saturation, value } =
-            color |> toHsva
+            color |> Hsva.toRecord
     in
     Slider.Position saturation (1 - value)
 
@@ -85,16 +86,16 @@ subscriptions (Model model) =
 
 view : Model -> Hsva -> Html Msg
 view (Model model) color =
-    matrixInput Slider colorToRelativePosition viewThumb viewBackground model color
+    Internal.matrixInput Slider colorToRelativePosition viewThumb viewBackground model color
 
 
 viewThumb : List (Attribute Slider.Msg) -> Hsva -> Html Slider.Msg
 viewThumb extraAttributes color =
     let
         thumbBackgroundColor =
-            color |> mapAlpha 1 |> toCss
+            color |> Hsva.mapAlpha 1 |> Hsva.toCss
     in
-    div (extraAttributes ++ [ style "backgroundColor" thumbBackgroundColor ])
+    H.div (extraAttributes ++ [ HA.style "backgroundColor" thumbBackgroundColor ])
         []
 
 
@@ -103,11 +104,12 @@ viewBackground extraAttributes color =
     let
         baseColor =
             color
-                |> mapSaturation 1
-                |> mapValue 1
-                |> toRgba
+                |> Hsva.mapSaturation 1
+                |> Hsva.mapValue 1
+                |> Hsva.toRgba
+                |> Rgba.toRecord
     in
-    WebGL.toHtml (extraAttributes ++ [ width 100, height 100, styles.class .canvas ])
+    WebGL.toHtml (extraAttributes ++ [ HA.width 100, HA.height 100, Internal.styles.class .canvas ])
         [ WebGL.entity
             vertexShader
             fragmentShader
@@ -125,7 +127,7 @@ viewBackground extraAttributes color =
 ---- MESH ---
 
 
-mesh : Mesh { position : Vec2 }
+mesh : WebGL.Mesh { position : Vec2 }
 mesh =
     WebGL.triangles
         [ ( { position = vec2 -1 1 }
@@ -143,7 +145,7 @@ mesh =
 ---- SHADERS ----
 
 
-vertexShader : Shader { position : Vec2 } { baseColor : Vec3 } { saturation : Float, value : Float }
+vertexShader : WebGL.Shader { position : Vec2 } { baseColor : Vec3 } { saturation : Float, value : Float }
 vertexShader =
     [glsl|
         attribute vec2 position;
@@ -159,7 +161,7 @@ vertexShader =
     |]
 
 
-fragmentShader : Shader {} { baseColor : Vec3 } { saturation : Float, value : Float }
+fragmentShader : WebGL.Shader {} { baseColor : Vec3 } { saturation : Float, value : Float }
 fragmentShader =
     [glsl|
         precision mediump float;

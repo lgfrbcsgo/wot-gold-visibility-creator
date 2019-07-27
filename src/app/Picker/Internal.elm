@@ -1,13 +1,13 @@
-module Picker.Shared exposing (matrixInput, sliderInput, styles)
+module Picker.Internal exposing (matrixInput, sliderInput, styles)
 
-import Color exposing (..)
+import Color.Hsva exposing (Hsva)
 import CssModules exposing (css)
-import Html exposing (Attribute, Html, div)
+import Html as H exposing (Attribute, Html)
 import Slider
 
 
 styles =
-    css "./Picker/Shared.css"
+    css "./Picker/Styles.css"
         { picker = "picker"
         , checkerboard = "checkerboard"
         , hueGradient = "hue-gradient"
@@ -16,7 +16,7 @@ styles =
 
 
 baseStyles =
-    css "./Picker/Shared.css"
+    css "./Picker/Styles.css"
         { slider = "slider"
         , matrix = "matrix"
         , background = "background"
@@ -42,11 +42,11 @@ base :
     -> Hsva
     -> Html msg
 base attributes toMsg toPosition viewThumb viewBackground sliderModel color =
-    div attributes
+    H.div attributes
         [ Slider.view
             (viewThumb [ baseStyles.class .thumb ] color)
             (viewBackground [ baseStyles.class .background ] color)
             (toPosition color)
             sliderModel
-            |> Html.map toMsg
+            |> H.map toMsg
         ]

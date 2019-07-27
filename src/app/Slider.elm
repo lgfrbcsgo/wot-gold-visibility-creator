@@ -1,11 +1,10 @@
 module Slider exposing (Model, Msg, Position, init, subscriptions, update, view)
 
-import Basics
-import Browser.Events
+import Browser.Events as BE
 import CssModules exposing (css)
-import Html exposing (Html)
-import Html.Attributes
-import Html.Events
+import Html as H exposing (Html)
+import Html.Attributes as HA
+import Html.Events as HE
 import Json.Decode as Decode
 
 
@@ -132,12 +131,12 @@ relativeToOffsetPosition size position =
 
 clampPosition : Position -> Position
 clampPosition position =
-    Position (clamp 0 1 position.x) (clamp 0 1 position.y)
+    Position (clamp position.x) (clamp position.y)
 
 
-clamp : comparable -> comparable -> comparable -> comparable
-clamp min max value =
-    value |> Basics.min max |> Basics.max min
+clamp : Float -> Float
+clamp value =
+    value |> min 1 |> max 0
 
 
 
@@ -149,14 +148,14 @@ subscriptions model =
     case model of
         Dragging _ ->
             Sub.batch
-                [ Browser.Events.onMouseMove <|
+                [ BE.onMouseMove <|
                     Decode.map Drag decodePagePosition
-                , Browser.Events.onMouseUp <|
+                , BE.onMouseUp <|
                     Decode.succeed DragEnd
                 ]
 
         ThumbClicked ->
-            Browser.Events.onMouseUp <|
+            BE.onMouseUp <|
                 Decode.succeed DragEnd
 
         Resting ->
@@ -194,13 +193,13 @@ view viewThumb viewBody relativePosition model =
             case model of
                 Dragging _ ->
                     -- prevent default to prevent native drag and drop behavior
-                    [ Html.Events.preventDefaultOn "dragstart" <|
+                    [ HE.preventDefaultOn "dragstart" <|
                         Decode.map (\msg -> ( msg, True )) <|
                             Decode.succeed NoOp
                     ]
 
                 _ ->
-                    [ Html.Events.onMouseDown ThumbClick ]
+                    [ HE.onMouseDown ThumbClick ]
 
         backgroundListeners =
             case model of
@@ -211,22 +210,22 @@ view viewThumb viewBody relativePosition model =
                     {- prevent default to prevent text selection on drag
                        since the thumb is a child of the background, it is enough to prevent the default only on the background
                     -}
-                    [ Html.Events.preventDefaultOn "mousedown" <|
+                    [ HE.preventDefaultOn "mousedown" <|
                         Decode.map (\context -> ( DragStart context, True )) <|
                             Decode.map3 DragContext decodeSize decodeOffsetPosition decodePagePosition
                     ]
     in
-    Html.div
+    H.div
         (backgroundListeners
             ++ [ styles.class .dragContainer
                ]
         )
         [ viewBody
-        , Html.div
+        , H.div
             (thumbListeners
                 ++ [ styles.class .thumb
-                   , Html.Attributes.style "top" thumbTop
-                   , Html.Attributes.style "left" thumbLeft
+                   , HA.style "top" thumbTop
+                   , HA.style "left" thumbLeft
                    ]
             )
             [ viewThumb

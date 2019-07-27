@@ -1,10 +1,11 @@
 port module Main exposing (main)
 
 import Browser
-import Color exposing (..)
+import Color.Hsva as Hsva exposing (Hsva, hsva)
+import Color.Rgba as Rgba exposing (Rgba, RgbaRecord)
 import CssModules exposing (css)
-import Html exposing (..)
-import Html.Events exposing (..)
+import Html as H exposing (Html)
+import Html.Events as HE
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Picker
@@ -97,16 +98,16 @@ update msg model =
             )
 
 
-createModPackage : Color any -> Cmd msg
+createModPackage : Hsva -> Cmd msg
 createModPackage =
-    encodeRgba >> startWorker
+    Hsva.toRgba >> encodeRgba >> startWorker
 
 
-encodeRgba : Color any -> Encode.Value
+encodeRgba : Rgba -> Encode.Value
 encodeRgba color =
     let
         { red, green, blue, alpha } =
-            color |> toRgba
+            color |> Rgba.toRecord
     in
     Encode.object
         [ ( "red", red * 255 |> round |> Encode.int )
@@ -146,18 +147,18 @@ styles =
 view : Model -> Html Msg
 view { picker, color, running } =
     if running then
-        text "Running..."
+        H.text "Running..."
 
     else
-        div []
-            [ h1 []
-                [ text "Gold Visibility Creator"
+        H.div []
+            [ H.h1 []
+                [ H.text "Gold Visibility Creator"
                 ]
-            , div [ styles.class .picker ]
-                [ Picker.view picker color |> map Picker
+            , H.div [ styles.class .picker ]
+                [ Picker.view picker color |> H.map Picker
                 ]
-            , button [ styles.class .button, onClick CreateModPackage ]
-                [ text "Create"
+            , H.button [ styles.class .button, HE.onClick CreateModPackage ]
+                [ H.text "Create"
                 ]
             ]
 

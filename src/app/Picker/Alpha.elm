@@ -1,10 +1,10 @@
 module Picker.Alpha exposing (Model, Msg, init, subscriptions, update, view)
 
 import Basics
-import Color exposing (..)
-import Html exposing (Attribute, Html, div)
-import Html.Attributes exposing (style)
-import Picker.Shared exposing (sliderInput, styles)
+import Color.Hsva as Hsva exposing (Hsva)
+import Html as H exposing (Attribute, Html)
+import Html.Attributes as HA
+import Picker.Internal as Internal
 import Slider
 
 
@@ -46,14 +46,14 @@ update (Slider msg) (Model model) color =
 
 updateColor : Hsva -> Slider.Position -> Hsva
 updateColor color relativePosition =
-    color |> mapAlpha relativePosition.x
+    color |> Hsva.mapAlpha relativePosition.x
 
 
 colorToRelativePosition : Hsva -> Slider.Position
 colorToRelativePosition color =
     let
         { alpha } =
-            color |> toHsva
+            color |> Hsva.toRecord
     in
     Slider.Position alpha 0.5
 
@@ -73,16 +73,16 @@ subscriptions (Model model) =
 
 view : Model -> Hsva -> Html Msg
 view (Model model) color =
-    sliderInput Slider colorToRelativePosition viewThumb viewBackground model color
+    Internal.sliderInput Slider colorToRelativePosition viewThumb viewBackground model color
 
 
 viewThumb : List (Attribute Slider.Msg) -> Hsva -> Html Slider.Msg
 viewThumb extraAttributes color =
     let
         backgroundColor =
-            color |> toCss
+            color |> Hsva.toCss
     in
-    div (extraAttributes ++ [ styles.class .checkerboard, style "backgroundColor" backgroundColor ])
+    H.div (extraAttributes ++ [ Internal.styles.class .checkerboard, HA.style "backgroundColor" backgroundColor ])
         []
 
 
@@ -90,10 +90,10 @@ viewBackground : List (Attribute Slider.Msg) -> Hsva -> Html Slider.Msg
 viewBackground extraAttributes color =
     let
         gradientColor =
-            color |> mapAlpha 1 |> toCss
+            color |> Hsva.mapAlpha 1 |> Hsva.toCss
 
         gradient =
             "linear-gradient(to right, transparent, " ++ gradientColor ++ ")"
     in
-    div (extraAttributes ++ [ styles.class .checkerboard, style "background" gradient ])
+    H.div (extraAttributes ++ [ Internal.styles.class .checkerboard, HA.style "background" gradient ])
         []
