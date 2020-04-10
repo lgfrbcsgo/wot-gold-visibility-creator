@@ -171,8 +171,10 @@ fragmentShader =
         varying float value;
 
         void main () {
+            const vec3 magic = vec3( 0.06711056, 0.00583715, 52.9829189 );
+            float rnd = fract( magic.z * fract( dot( vec2(value, saturation), magic.xy ) ) );
             vec3 whiteOverlayed = baseColor * saturation + 1.0 - saturation;
             vec3 blackOverlayed = whiteOverlayed * value;
-            gl_FragColor = vec4(blackOverlayed, 1.0);
+            gl_FragColor = vec3(blackOverlayed) + vec3(rnd/255.0);
         }
     |]
