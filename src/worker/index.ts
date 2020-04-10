@@ -63,3 +63,34 @@ async function loadResource({src, path}: TextureConfig): Promise<TextureResource
     const imageData = getImageBitmap(image);
     return {imageData, path};
 }
+
+/*
+async function* fetchResources() {
+    const path = 'https://lgfrbcsgo.github.io/wot-gold-visibility-creator/9593a0fa659ce650827e90313dc46b21.png';
+    const response = await fetch(path);
+
+    const contentLength = response.headers.get('content-length');
+    const reader = response.body.getReader();
+
+    let offset = 0;
+    const buffer = new Uint8Array(contentLength);
+
+    while(true) {
+        const {done, value} = await reader.read();
+
+        if (done) {
+            return buffer;
+        }
+
+        buffer.set(value, offset);
+        offset += value.length;
+
+        yield offset / contentLength;
+    }
+}
+
+async function* test() {
+    const value = yield* fetchResources();
+    console.log(value);
+}
+ */

@@ -175,6 +175,6 @@ fragmentShader =
             float rnd = fract( magic.z * fract( dot( vec2(value, saturation), magic.xy ) ) );
             vec3 whiteOverlayed = baseColor * saturation + 1.0 - saturation;
             vec3 blackOverlayed = whiteOverlayed * value;
-            gl_FragColor = vec3(blackOverlayed) + vec3(rnd/255.0);
+            gl_FragColor = vec4(vec3(blackOverlayed) + vec3(rnd/255.0), 1.0);
         }
     |]
